@@ -1,2 +1,0 @@
-def pe():
-    return "bye"
