@@ -9,7 +9,7 @@
 | Home      | TODO    | TODO          |
 | Login     | TODO    | TODO          |
 | Register  | TODO    | TODO          |
-| ....      | | |
+| ....      |         |               |
 
 ---
 
