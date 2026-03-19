@@ -6,7 +6,7 @@
 
 ---
 
-1. As a new user, I want to register an account with a username, email, and password, so that my check-ins are saved under my own profile and others can find my posts.
-2. As a logged-in user, I want to view my profile page showing my avatar, bio, total check-ins, and districts visited, so that I can track my own exploration history in one place.
-3. As a logged-in user, I want to save a check-in posted by another user, so that I can keep a personal list of places I want to visit later.
-4. As a logged-in user, I want to leave a comment on a check-in, so that I can share my own experience of that place or ask the author a question.
+1. As a visitor, I want to browse all check-ins on an Explore page and filter them by category, minimum rating, and sort order, so that I can find posts relevant to what I am looking for.
+2. As a visitor, I want to click on a check-in card to open its full detail page, so that I can read the complete description, view all photos, see the exact location on a map, and read comments.
+3. As a visitor, I want to search for check-ins by keyword, so that I can quickly find posts about a specific place or topic without scrolling through the full list.
+4. As a visitor, I want to see a leaderboard ranking users by their total check-ins, number of districts explored, and average rating, so that I can see who the most active explorers in the community are.
