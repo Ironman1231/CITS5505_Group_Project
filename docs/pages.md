@@ -4,18 +4,24 @@
 
 ---
 
-| Page Name       | File                  | Purpose                                             |
-|-----------------|-----------------------|-----------------------------------------------------|
-| Home            | `index.html`          | Landing page with map and latest check-ins          |
-| Explore         | `explore.html`        | Browse and filter all check-ins                     |
-| Check-in Detail | `checkin-detail.html` | Full view of a single check-in post                 |
-| New Check-in    | `new-checkin.html`    | Form to create and publish a new check-in           |
-| User Profile    | `profile.html`        | Personal dashboard showing a user's posts and saves |
-| Leaderboard     | `leaderboard.html`    | Rankings of top explorers across various categories |
+| Page Name        | File                  | Purpose                                             |
+|------------------|-----------------------|-----------------------------------------------------|
+| Login / Register | `login.html`          | User registration and login                         |
+| Home             | `index.html`          | Landing page with map and latest check-ins          |
+| Explore          | `explore.html`        | Browse, filter, and search all check-ins            |
+| Check-in Detail  | `checkin-detail.html` | Full view of a single check-in post                 |
+| New Check-in     | `new-checkin.html`    | Form to create and publish a new check-in           |
+| User Profile     | `profile.html`        | Personal dashboard showing a user's posts and saves |
+| Leaderboard      | `leaderboard.html`    | Rankings of top explorers across various categories |
 
 ---
 
 ## Page Descriptions
+
+
+### Login / Register (`login.html`)      
+- **Purpose:** Allow new users to create an account and existing users to log in.
+- **Core Features:** Register with username, email, and password;
 
 ### Home (`index.html`)
 - **Purpose:** Introduce the platform and give users an at-a-glance view of community activity around Perth and UWA.
@@ -27,7 +33,7 @@
 
 ### Check-in Detail (`checkin-detail.html`)
 - **Purpose:** Let users read the full content of a check-in and engage with it.
-- **Core Features:** View photos, description, location, and rating of a place; save the post; leave a comment.
+- **Core Features:** View photos, description, location, and rating of a place; save the post; leave a comment. delete own post.
 
 ### New Check-in (`new-checkin.html`)
 - **Purpose:** Allow users to share a place they have visited with the community.
