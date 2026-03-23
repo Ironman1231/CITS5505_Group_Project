@@ -1,0 +1,30 @@
+/* Shared styles — included by every page */
+
+body { background-color: #f8f9f3; font-family: system-ui, sans-serif; color: #333; }
+a { text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.navbar { background: #fff !important; border-bottom: 1px solid #ddd; }
+.navbar-brand { font-weight: 700; font-size: 1.3rem; color: #2d6a4f !important; }
+.navbar .nav-link { color: #444 !important; font-weight: 500; }
+.navbar .nav-link:hover, .navbar .nav-link.active { color: #2d6a4f !important; }
+
+.cat-label { font-size: 0.8rem; font-weight: 600; display: inline-block; }
+.cat-food    { color: #fd7e14; }
+.cat-study   { color: #0d6efd; }
+.cat-nature  { color: #198754; }
+.cat-nightlife { color: #6f42c1; }
+.cat-shopping  { color: #d63384; }
+.cat-other   { color: #6c757d; }
+
+.rating-num { font-weight: 600; font-size: 0.9rem; }
+
+.checkin-card { border: 1px solid #ddd; background: #fff; }
+.checkin-card .card-img-top { height: 180px; object-fit: cover; }
+.checkin-card .card-title { font-size: 1rem; font-weight: 600; }
+.checkin-card .card-text { font-size: 0.85rem; color: #666; }
+
+.btn-pp { background: #2d6a4f; border-color: #2d6a4f; color: #fff; }
+.btn-pp:hover { background: #245a40; border-color: #245a40; color: #fff; }
+
+.text-green { color: #2d6a4f !important; }
