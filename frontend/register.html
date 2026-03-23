@@ -2,49 +2,94 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+
+  <!-- Mobile responsive -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>Register — PerthPins</title>
 
+  <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+
+  <!-- Custom styles -->
   <link rel="stylesheet" href="css/common.css">
   <link rel="stylesheet" href="css/login.css">
 </head>
 
 <body>
 
+<!-- Navbar will be injected here -->
 <div id="navbar"></div>
 
 <div class="register-page">
   <div class="register-container">
 
+    <!-- Page title -->
     <h4 class="register-title">Register</h4>
 
-    <form class="register-form">
+    <!-- Registration form -->
+    <form class="register-form" method="POST">
 
+      <!-- Username input -->
       <div class="form-group">
-        <label>Username</label>
-        <input type="text" class="form-control" value="prathish7">
+        <label for="username">Username</label>
+        <input 
+          type="text" 
+          id="username"
+          name="username"
+          class="form-control" 
+          value="prathish7"
+          required
+        >
       </div>
 
+      <!-- Email input -->
       <div class="form-group">
-        <label>Email</label>
-        <input type="email" class="form-control" placeholder="you@example.com">
+        <label for="email">Email</label>
+        <input 
+          type="email" 
+          id="email"
+          name="email"
+          class="form-control" 
+          placeholder="you@example.com"
+          required
+        >
       </div>
 
+      <!-- Password input -->
       <div class="form-group">
-        <label>Password</label>
-        <input type="password" class="form-control" placeholder="Enter password">
+        <label for="password">Password</label>
+        <input 
+          type="password" 
+          id="password"
+          name="password"
+          class="form-control" 
+          placeholder="Enter password"
+          required
+        >
       </div>
 
+      <!-- Confirm password input -->
       <div class="form-group">
-        <label>Confirm Password</label>
-        <input type="password" class="form-control" placeholder="Re-enter password">
+        <label for="confirm_password">Confirm Password</label>
+        <input 
+          type="password" 
+          id="confirm_password"
+          name="confirm_password"
+          class="form-control" 
+          placeholder="Re-enter password"
+          required
+        >
       </div>
 
-      <button type="submit" class="btn btn-pp w-100">Create Account</button>
+      <!-- Submit button -->
+      <button type="submit" class="btn btn-pp w-100">
+        Create Account
+      </button>
 
     </form>
 
+    <!-- Redirect to login -->
     <p class="login-link text-center small mt-3">
       Already have an account? <a href="login.html">Log in</a>
     </p>
