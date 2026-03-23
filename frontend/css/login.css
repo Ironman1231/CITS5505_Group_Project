@@ -1,0 +1,17 @@
+/* Login / Register page styles */
+
+.auth-wrapper {
+  min-height: calc(100vh - 58px);
+  display: flex;
+  align-items: center;
+  background-color: #f8f9f3;
+}
+
+.auth-card {
+  background: #fff;
+  border: 1px solid #ddd;
+  padding: 2rem;
+  width: 100%;
+  max-width: 400px;
+  margin: 2rem auto;
+}
