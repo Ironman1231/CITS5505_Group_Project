@@ -1,0 +1,11 @@
+/* Home page styles */
+
+.section-title { font-size: 1.3rem; font-weight: 700; color: #2d6a4f; margin-bottom: 1rem; }
+
+#main-map { height: 520px; }
+
+@media (max-width: 768px) {
+  #main-map { height: 320px; }
+}
+
+.map-container { position: relative; overflow: hidden; }
