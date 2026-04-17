@@ -18,7 +18,7 @@
 
 ## How to Run the Application
 
-> TODO
+> Go to backend. Then run flask run in terminal
 
 
 ---
