@@ -20,77 +20,41 @@
 
 <div id="navbar-placeholder"></div>
 
-<div class="register-page">
-  <div class="register-container">
+<div class="auth-wrapper">
+  <div class="auth-card">
 
-    <!-- Page title -->
-    <h4 class="register-title">Register</h4>
+    <h4 class="fw-bold mb-4">Register</h4>
 
-    <!-- Registration form -->
-    <form class="register-form" method="POST">
-
-      <!-- Username input -->
-      <div class="form-group">
-        <label for="username">Username</label>
-        <input 
-          type="text" 
-          id="username"
-          name="username"
-          class="form-control" 
-          placeholder="Choose a username"
-          required
-        >
+    <form id="register-form">
+      <div class="mb-3">
+        <label for="username" class="form-label">Username</label>
+        <input type="text" class="form-control" id="username" name="username"
+               placeholder="Choose a username" required />
+        <div class="invalid-feedback">Required.</div>
       </div>
-
-      <!-- Email input -->
-      <div class="form-group">
-        <label for="email">Email</label>
-        <input 
-          type="email" 
-          id="email"
-          name="email"
-          class="form-control" 
-          placeholder="you@example.com"
-          required
-        >
+      <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <input type="email" class="form-control" id="email" name="email"
+               placeholder="you@example.com" required />
+        <div class="invalid-feedback">Required.</div>
       </div>
-
-      <!-- Password input -->
-      <div class="form-group">
-        <label for="password">Password</label>
-        <input 
-          type="password" 
-          id="password"
-          name="password"
-          class="form-control" 
-          placeholder="Enter password"
-          required
-        >
+      <div class="mb-3">
+        <label for="password" class="form-label">Password</label>
+        <input type="password" class="form-control" id="password" name="password"
+               placeholder="Enter password" required />
+        <div class="invalid-feedback">Required.</div>
       </div>
-
-      <!-- Confirm password input -->
-      <div class="form-group">
-        <label for="confirm_password">Confirm Password</label>
-        <input 
-          type="password" 
-          id="confirm_password"
-          name="confirm_password"
-          class="form-control" 
-          placeholder="Re-enter password"
-          required
-        >
+      <div class="mb-4">
+        <label for="confirm_password" class="form-label">Confirm Password</label>
+        <input type="password" class="form-control" id="confirm_password" name="confirm_password"
+               placeholder="Re-enter password" required />
+        <div class="invalid-feedback">Required.</div>
       </div>
-
-      <!-- Submit button -->
-      <button type="submit" class="btn btn-pp w-100">
-        Create Account
-      </button>
-
+      <button type="submit" class="btn btn-pp w-100">Create Account</button>
     </form>
 
-    <!-- Redirect to login -->
-    <p class="login-link text-center small mt-3">
-      Already have an account? <a href="login.html">Log in</a>
+    <p class="text-center small text-muted mt-3 mb-0">
+      Already have an account? <a href="login.html" class="text-green">Log in</a>
     </p>
 
   </div>
