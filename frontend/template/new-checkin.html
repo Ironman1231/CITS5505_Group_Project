@@ -107,11 +107,11 @@
               <i class="bi bi-star me-1 text-green"></i>Your Rating
             </label>
             <div class="star-picker" id="star-picker">
-              <i class="bi bi-star-fill" data-value="1"></i>
-              <i class="bi bi-star-fill" data-value="2"></i>
-              <i class="bi bi-star-fill" data-value="3"></i>
-              <i class="bi bi-star-fill" data-value="4"></i>
-              <i class="bi bi-star-fill" data-value="5"></i>
+              <i class="bi bi-star" data-value="1"></i>
+              <i class="bi bi-star" data-value="2"></i>
+              <i class="bi bi-star" data-value="3"></i>
+              <i class="bi bi-star" data-value="4"></i>
+              <i class="bi bi-star" data-value="5"></i>
             </div>
             <div class="form-text">Click a star to rate (1 = poor, 5 = excellent)</div>
           </div>
@@ -245,22 +245,45 @@
     badge.textContent = label;
   });
 
-  /* ---- Live preview: star rating ---- */
+  /* ---- Star rating picker ---- */
   const starPicker = document.getElementById('star-picker');
+  const starIcons  = starPicker.querySelectorAll('[data-value]');
+
+  function renderPickerStars(filled) {
+    starIcons.forEach(function (s) {
+      const v = parseInt(s.dataset.value);
+      s.className = v <= filled ? 'bi bi-star-fill' : 'bi bi-star';
+    });
+  }
+
+  function renderPreviewStars(val) {
+    let html = '';
+    for (let i = 1; i <= 5; i++) {
+      html += i <= val ? '<i class="bi bi-star-fill"></i>' : '<i class="bi bi-star"></i>';
+    }
+    html += '<small class="text-muted ms-1">' + val + '</small>';
+    document.getElementById('preview-stars').innerHTML = html;
+  }
+
+  // Hover: preview fill
+  starPicker.addEventListener('mouseover', function (e) {
+    const star = e.target.closest('[data-value]');
+    if (star) renderPickerStars(parseInt(star.dataset.value));
+  });
+
+  // Mouse leave: restore current rating
+  starPicker.addEventListener('mouseleave', function () {
+    renderPickerStars(parseInt(document.getElementById('rating-value').value) || 0);
+  });
+
+  // Click: commit rating
   starPicker.addEventListener('click', function (e) {
     const star = e.target.closest('[data-value]');
     if (!star) return;
     const val = parseInt(star.dataset.value);
     document.getElementById('rating-value').value = val;
-    const previewStars = document.getElementById('preview-stars');
-    let html = '';
-    for (let i = 1; i <= 5; i++) {
-      html += i <= val
-        ? '<i class="bi bi-star-fill"></i>'
-        : '<i class="bi bi-star"></i>';
-    }
-    html += `<small class="text-muted ms-1">${val}</small>`;
-    previewStars.innerHTML = html;
+    renderPickerStars(val);
+    renderPreviewStars(val);
   });
 
   /* ---- Form submit feedback ---- */
