@@ -1,0 +1,48 @@
+/* Profile page styles */
+
+.profile-header {
+  background: linear-gradient(135deg, #2d6a4f 0%, #40916c 100%);
+  color: #fff;
+  padding: 2rem 0 1.5rem;
+}
+
+.profile-avatar {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid rgba(255, 255, 255, 0.6);
+}
+
+.stat-box {
+  padding: 0.5rem 1.25rem 0.5rem 0;
+  margin-right: 1rem;
+  border-right: 1px solid rgba(255, 255, 255, 0.25);
+}
+.stat-box:last-child { border-right: none; }
+
+.stat-num {
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.stat-label {
+  font-size: 0.78rem;
+  opacity: 0.8;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Category badge colours (used on cards) */
+.badge-food      { background-color: #fd7e14; color: #fff; }
+.badge-study     { background-color: #0d6efd; color: #fff; }
+.badge-nature    { background-color: #198754; color: #fff; }
+.badge-nightlife { background-color: #6f42c1; color: #fff; }
+.badge-shopping  { background-color: #d63384; color: #fff; }
+.badge-other     { background-color: #6c757d; color: #fff; }
+
+/* Star icons */
+.stars .bi-star-fill { color: #ffc107; font-size: 0.85rem; }
+.stars .bi-star-half { color: #ffc107; font-size: 0.85rem; }
+.stars .bi-star      { color: #ccc;    font-size: 0.85rem; }
