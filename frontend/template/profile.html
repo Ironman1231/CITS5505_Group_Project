@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>perthwanderer — PerthPins</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <link rel="stylesheet" href="../static/css/common.css" />
+  <link rel="stylesheet" href="../static/css/profile.css" />
+</head>
+<body>
+
+<div id="navbar-placeholder"></div>
+
+
+<!-- ===================== PROFILE HEADER ===================== -->
+<div class="profile-header">
+  <div class="container">
+    <div class="row align-items-center g-3">
+      <!-- Avatar + name -->
+      <div class="col-auto">
+        <img src="https://picsum.photos/100/100?random=101"
+             class="profile-avatar" alt="perthwanderer avatar" />
+      </div>
+      <div class="col">
+        <h1 class="h3 fw-bold mb-0">perthwanderer</h1>
+        <p class="mb-1 opacity-75 small">
+          <i class="bi bi-geo-alt me-1"></i>Perth, WA
+          <span class="mx-2">|</span>
+          <i class="bi bi-calendar3 me-1"></i>Joined January 2024
+        </p>
+        <p class="mb-0 small" style="max-width:480px;">
+          Exploring every corner of Perth and UWA — always searching for the best sunset spots,
+          hidden cafes, and quiet study retreats.
+        </p>
+      </div>
+      <!-- Edit profile button (own profile) -->
+      <div class="col-auto">
+        <a href="#" class="btn btn-light btn-sm">
+          <i class="bi bi-pencil me-1"></i>Edit Profile
+        </a>
+      </div>
+    </div>
+
+    <!-- Stats bar -->
+    <div class="row mt-4 g-0 text-white">
+      <div class="col-auto">
+        <div class="stat-box">
+          <div class="stat-num">47</div>
+          <div class="stat-label">Check-ins</div>
+        </div>
+      </div>
+      <div class="col-auto">
+        <div class="stat-box">
+          <div class="stat-num">12</div>
+          <div class="stat-label">Districts</div>
+        </div>
+      </div>
+      <div class="col-auto">
+        <div class="stat-box">
+          <div class="stat-num">4.3</div>
+          <div class="stat-label">Avg Rating</div>
+        </div>
+      </div>
+      <div class="col-auto">
+        <div class="stat-box">
+          <div class="stat-num">34</div>
+          <div class="stat-label">Saved</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ===================== END PROFILE HEADER ===================== -->
+
+
+<main class="container py-4">
+
+  <!-- Tabs -->
+  <ul class="nav nav-tabs mb-4" id="profileTabs">
+    <li class="nav-item">
+      <a class="nav-link active" id="mycheckins-tab"
+         data-bs-toggle="tab" href="#mycheckins" role="tab">
+        <i class="bi bi-grid me-1"></i>My Check-ins
+        <span class="badge bg-secondary ms-1">47</span>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="saved-tab"
+         data-bs-toggle="tab" href="#saved" role="tab">
+        <i class="bi bi-heart me-1"></i>Saved
+        <span class="badge bg-secondary ms-1">34</span>
+      </a>
+    </li>
+  </ul>
+
+  <div class="tab-content" id="profileTabsContent">
+
+    <!-- ===== MY CHECK-INS TAB ===== -->
+    <div class="tab-pane fade show active" id="mycheckins" role="tabpanel">
+      <div class="row g-4">
+
+        <!-- Card 1 -->
+        <div class="col-sm-6 col-lg-4">
+          <div class="card checkin-card h-100">
+            <img src="https://picsum.photos/400/300?random=71" class="card-img-top" alt="Matilda Bay" />
+            <div class="card-body">
+              <span class="badge badge-nature mb-2">Nature</span>
+              <h5 class="card-title">Matilda Bay</h5>
+              <div class="stars mb-1">
+                <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-half"></i>
+                <small class="text-muted ms-1">4.5</small>
+              </div>
+              <p class="card-text">Sunset views just beside UWA campus are absolutely stunning...</p>
+              <small class="text-muted"><i class="bi bi-calendar3 me-1"></i>12 Mar 2025</small>
+            </div>
+            <div class="card-footer bg-transparent border-0 d-flex gap-2">
+              <a href="checkin_details.html" class="btn btn-sm btn-outline-secondary flex-grow-1">View</a>
+              <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="col-sm-6 col-lg-4">
+          <div class="card checkin-card h-100">
+            <img src="https://picsum.photos/400/300?random=72" class="card-img-top" alt="Kings Park" />
+            <div class="card-body">
+              <span class="badge badge-nature mb-2">Nature</span>
+              <h5 class="card-title">Kings Park Botanic Garden</h5>
+              <div class="stars mb-1">
+                <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-fill"></i>
+                <small class="text-muted ms-1">4.8</small>
+              </div>
+              <p class="card-text">Wildflower season is breathtaking, absolutely worth the visit!</p>
+              <small class="text-muted"><i class="bi bi-calendar3 me-1"></i>5 Mar 2025</small>
+            </div>
+            <div class="card-footer bg-transparent border-0 d-flex gap-2">
+              <a href="checkin_details.html" class="btn btn-sm btn-outline-secondary flex-grow-1">View</a>
+              <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="col-sm-6 col-lg-4">
+          <div class="card checkin-card h-100">
+            <img src="https://picsum.photos/400/300?random=73" class="card-img-top" alt="Elizabeth Quay" />
+            <div class="card-body">
+              <span class="badge badge-nature mb-2">Nature</span>
+              <h5 class="card-title">Elizabeth Quay</h5>
+              <div class="stars mb-1">
+                <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-half"></i>
+                <small class="text-muted ms-1">3.9</small>
+              </div>
+              <p class="card-text">Nice waterfront area, a bit touristy but great night views...</p>
+              <small class="text-muted"><i class="bi bi-calendar3 me-1"></i>28 Feb 2025</small>
+            </div>
+            <div class="card-footer bg-transparent border-0 d-flex gap-2">
+              <a href="checkin_details.html" class="btn btn-sm btn-outline-secondary flex-grow-1">View</a>
+              <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 4 -->
+        <div class="col-sm-6 col-lg-4">
+          <div class="card checkin-card h-100">
+            <img src="https://picsum.photos/400/300?random=74" class="card-img-top" alt="Optus Stadium" />
+            <div class="card-body">
+              <span class="badge badge-nature mb-2">Nature</span>
+              <h5 class="card-title">Optus Stadium Riverside</h5>
+              <div class="stars mb-1">
+                <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-half"></i>
+                <small class="text-muted ms-1">4.1</small>
+              </div>
+              <p class="card-text">A relaxing loop around the stadium along the river...</p>
+              <small class="text-muted"><i class="bi bi-calendar3 me-1"></i>20 Feb 2025</small>
+            </div>
+            <div class="card-footer bg-transparent border-0 d-flex gap-2">
+              <a href="checkin_details.html" class="btn btn-sm btn-outline-secondary flex-grow-1">View</a>
+              <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 5 -->
+        <div class="col-sm-6 col-lg-4">
+          <div class="card checkin-card h-100">
+            <img src="https://picsum.photos/400/300?random=75" class="card-img-top" alt="Fremantle Markets" />
+            <div class="card-body">
+              <span class="badge badge-shopping mb-2">Shopping</span>
+              <h5 class="card-title">Fremantle Markets</h5>
+              <div class="stars mb-1">
+                <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-half"></i>
+                <small class="text-muted ms-1">4.3</small>
+              </div>
+              <p class="card-text">Weekend market with local food and handmade crafts...</p>
+              <small class="text-muted"><i class="bi bi-calendar3 me-1"></i>15 Feb 2025</small>
+            </div>
+            <div class="card-footer bg-transparent border-0 d-flex gap-2">
+              <a href="checkin_details.html" class="btn btn-sm btn-outline-secondary flex-grow-1">View</a>
+              <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 6 -->
+        <div class="col-sm-6 col-lg-4">
+          <div class="card checkin-card h-100">
+            <img src="https://picsum.photos/400/300?random=76" class="card-img-top" alt="Leederville" />
+            <div class="card-body">
+              <span class="badge badge-food mb-2">Food &amp; Drink</span>
+              <h5 class="card-title">Leederville Coffee Strip</h5>
+              <div class="stars mb-1">
+                <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                <small class="text-muted ms-1">4.0</small>
+              </div>
+              <p class="card-text">Oxford St has so many great brunch spots along the strip...</p>
+              <small class="text-muted"><i class="bi bi-calendar3 me-1"></i>10 Feb 2025</small>
+            </div>
+            <div class="card-footer bg-transparent border-0 d-flex gap-2">
+              <a href="checkin_details.html" class="btn btn-sm btn-outline-secondary flex-grow-1">View</a>
+              <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Load more -->
+      <div class="text-center mt-4">
+        <button class="btn btn-outline-secondary px-4">
+          Load More <i class="bi bi-chevron-down ms-1"></i>
+        </button>
+      </div>
+    </div><!-- /mycheckins tab -->
+
+
+    <!-- ===== SAVED TAB ===== -->
+    <div class="tab-pane fade" id="saved" role="tabpanel">
+      <div class="row g-4">
+
+        <!-- Saved 1 -->
+        <div class="col-sm-6 col-lg-4">
+          <div class="card checkin-card h-100">
+            <img src="https://picsum.photos/400/300?random=81" class="card-img-top" alt="Chicho Gelato" />
+            <div class="card-body">
+              <span class="badge badge-food mb-2">Food &amp; Drink</span>
+              <h5 class="card-title">Chicho Gelato</h5>
+              <div class="stars mb-1">
+                <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-half"></i>
+                <small class="text-muted ms-1">4.6</small>
+              </div>
+              <p class="card-text">Best gelato in Perth — queue is long but totally worth it...</p>
+              <small class="text-muted"><i class="bi bi-person-circle me-1"></i>coffee_pilgrim</small>
+            </div>
+            <div class="card-footer bg-transparent border-0 d-flex gap-2">
+              <a href="checkin_details.html" class="btn btn-sm btn-outline-secondary flex-grow-1">View</a>
+              <button class="btn btn-sm btn-outline-secondary btn-fav text-danger">
+                <i class="bi bi-heart-fill"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Saved 2 -->
+        <div class="col-sm-6 col-lg-4">
+          <div class="card checkin-card h-100">
+            <img src="https://picsum.photos/400/300?random=82" class="card-img-top" alt="Reid Library" />
+            <div class="card-body">
+              <span class="badge badge-study mb-2">Study Spot</span>
+              <h5 class="card-title">Reid Library</h5>
+              <div class="stars mb-1">
+                <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-half"></i>
+                <small class="text-muted ms-1">4.2</small>
+              </div>
+              <p class="card-text">Best study spot on campus — especially level 4...</p>
+              <small class="text-muted"><i class="bi bi-person-circle me-1"></i>studyspot_hunter</small>
+            </div>
+            <div class="card-footer bg-transparent border-0 d-flex gap-2">
+              <a href="checkin_details.html" class="btn btn-sm btn-outline-secondary flex-grow-1">View</a>
+              <button class="btn btn-sm btn-outline-secondary btn-fav text-danger">
+                <i class="bi bi-heart-fill"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Saved 3 -->
+        <div class="col-sm-6 col-lg-4">
+          <div class="card checkin-card h-100">
+            <img src="https://picsum.photos/400/300?random=83" class="card-img-top" alt="Petition Beer Corner" />
+            <div class="card-body">
+              <span class="badge badge-nightlife mb-2">Nightlife</span>
+              <h5 class="card-title">Petition Beer Corner</h5>
+              <div class="stars mb-1">
+                <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-half"></i>
+                <small class="text-muted ms-1">4.2</small>
+              </div>
+              <p class="card-text">Great craft beer selection, amazing State Buildings atmosphere...</p>
+              <small class="text-muted"><i class="bi bi-person-circle me-1"></i>nightlife_nerd</small>
+            </div>
+            <div class="card-footer bg-transparent border-0 d-flex gap-2">
+              <a href="checkin_details.html" class="btn btn-sm btn-outline-secondary flex-grow-1">View</a>
+              <button class="btn btn-sm btn-outline-secondary btn-fav text-danger">
+                <i class="bi bi-heart-fill"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Saved 4 -->
+        <div class="col-sm-6 col-lg-4">
+          <div class="card checkin-card h-100">
+            <img src="https://picsum.photos/400/300?random=84" class="card-img-top" alt="UWA Oak Lawn" />
+            <div class="card-body">
+              <span class="badge badge-nature mb-2">Nature</span>
+              <h5 class="card-title">UWA Oak Lawn</h5>
+              <div class="stars mb-1">
+                <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                <small class="text-muted ms-1">4.0</small>
+              </div>
+              <p class="card-text">Perfect spot for a picnic between classes on campus...</p>
+              <small class="text-muted"><i class="bi bi-person-circle me-1"></i>campus_explorer</small>
+            </div>
+            <div class="card-footer bg-transparent border-0 d-flex gap-2">
+              <a href="checkin_details.html" class="btn btn-sm btn-outline-secondary flex-grow-1">View</a>
+              <button class="btn btn-sm btn-outline-secondary btn-fav text-danger">
+                <i class="bi bi-heart-fill"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div><!-- /saved tab -->
+
+  </div><!-- /tab-content -->
+
+</main>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../static/js/common.js"></script>
+<script>loadComponent('navbar-placeholder', 'navbar.html');</script>
+
+</body>
+</html>

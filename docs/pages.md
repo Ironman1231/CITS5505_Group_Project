@@ -9,7 +9,7 @@
 | Login / Register | `login.html`          | User registration and login                         |
 | Home             | `index.html`          | Landing page with map and latest check-ins          |
 | Explore          | `explore.html`        | Browse, filter, and search all check-ins            |
-| Check-in Detail  | `checkin-detail.html` | Full view of a single check-in post                 |
+| Check-in Detail  | `checkin_details.html` | Full view of a single check-in post                 |
 | New Check-in     | `new-checkin.html`    | Form to create and publish a new check-in           |
 | User Profile     | `profile.html`        | Personal dashboard showing a user's posts and saves |
 | Leaderboard      | `leaderboard.html`    | Rankings of top explorers across various categories |
@@ -31,7 +31,7 @@
 - **Purpose:** Help users discover check-ins that match their interests.
 - **Core Features:** Filter check-ins by various conditions; search by keyword.
 
-### Check-in Detail (`checkin-detail.html`)
+### Check-in Detail (`checkin_details.html`)
 - **Purpose:** Let users read the full content of a check-in and engage with it.
 - **Core Features:** View photos, description, location, and rating of a place; save the post; leave a comment. delete own post.
 
