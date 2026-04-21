@@ -18,9 +18,9 @@
         <button class="btn btn-outline-secondary btn-sm ms-1" type="button">Search</button>
       </form>
       <div class="d-flex gap-2">
-        <a href="new-checkin.html" class="btn btn-pp btn-sm">+ New Check-in</a>
-        <a href="login.html" class="btn btn-outline-secondary btn-sm">Log In</a>
-        <a href="register.html" class="btn btn-outline-secondary btn-sm">Register</a>
+        <a href="{{ url_for('checkin_details') }}" class="btn btn-pp btn-sm">+ New Check-in</a>
+        <a href="{{ url_for('login') }}" class="btn btn-outline-secondary btn-sm">Log In</a>
+        <a href="{{ url_for('register') }}" class="btn btn-outline-secondary btn-sm">Register</a>
       </div>
     </div>
   </div>
