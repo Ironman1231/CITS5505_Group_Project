@@ -1,19 +1,23 @@
-from flask import Flask, render_template
-from extensions import db
-from flask_migrate import Migrate
-from config import Config
-import os
-
 """
 Application entry point.
 """
 
-# Use package imports
+import os
+
+from flask import Flask, redirect, render_template, url_for
+
 from .config import Config
 from .extensions import db, migrate
+from . import models  # noqa: F401
+
 
 # Configure Flask to reuse the existing prototype templates and static files
-app = Flask(__name__, template_folder="../frontend/template", static_folder="../frontend/static")
+app = Flask(
+    __name__,
+    template_folder="../frontend/template",
+    static_folder="../frontend/static",
+    instance_path=os.path.join(os.path.dirname(__file__), "instance"),
+)
 
 
 # set the configuration through the object Config in the config.py
