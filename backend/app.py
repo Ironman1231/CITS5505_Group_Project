@@ -15,8 +15,6 @@ def index():
     """Render the home page prototype"""
     return render_template("index.html")
 
-
-
 @app.route("/explore")
 def explore_alias():
     return redirect(url_for("explore"))
