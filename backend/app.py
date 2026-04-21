@@ -1,3 +1,9 @@
+from flask import Flask, render_template
+from extensions import db
+from flask_migrate import Migrate
+from config import Config
+import os
+
 """
 Application entry point
 Register the prototype pages as Flask routes
@@ -9,7 +15,17 @@ from flask import Flask, redirect, render_template, url_for
 # Configure Flask to reuse the existing prototype templates and static files
 app = Flask(__name__, template_folder="../frontend/template", static_folder="../frontend/static")
 
-@app.route("/")
+# set the configuration through the object Config in the config.py
+app.config.from_object(Config)
+# create a folder named instance
+os.makedirs(app.instance_path, exist_ok=True)
+
+
+# bind SQLAlchemy with app
+db.init_app(app)
+migrate = Migrate(app, db)
+
+@app.route('/')
 @app.route("/index.html")
 def index():
     """Render the home page prototype"""
