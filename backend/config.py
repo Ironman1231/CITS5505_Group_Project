@@ -3,8 +3,8 @@ Application configuration
 """
 import os
 
-basedir = os.path.abspath(os.path.dirname(__file__))
-
+# set the database
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
 class Config:
 
@@ -13,6 +13,6 @@ class Config:
     # Set SQLALCHEMY_DATABASE_URI from environment variable or default to a local SQLite database
     SQLALCHEMY_DATABASE_URI = os.environ.get(
         'DATABASE_URL',
-        'sqlite:///' + os.path.join(basedir, 'perthpins.db')
+        "sqlite:///" + os.path.join(BASE_DIR, "instance", "perth_explorer.db")
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False

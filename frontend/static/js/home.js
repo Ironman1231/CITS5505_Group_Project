@@ -1,10 +1,10 @@
-var map = L.map('main-map').setView([-31.9805, 115.8178], 14);
+let map = L.map('map').setView([-31.9805, 115.8178], 14);
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '&copy; OpenStreetMap contributors'
 }).addTo(map);
 
-var markers = [
+let markers = [
   { name: 'Matilda Bay',        lat: -31.9789, lng: 115.8148 },
   { name: 'Reid Library',       lat: -31.9800, lng: 115.8183 },
   { name: 'UWA Oak Lawn',       lat: -31.9795, lng: 115.8170 },
@@ -15,7 +15,7 @@ var markers = [
   { name: 'Northbridge',        lat: -31.9468, lng: 115.8585 }
 ];
 
-for (var i = 0; i < markers.length; i++) {
+for (let i = 0; i < markers.length; i++) {
   L.marker([markers[i].lat, markers[i].lng])
     .addTo(map)
     .bindPopup(markers[i].name);

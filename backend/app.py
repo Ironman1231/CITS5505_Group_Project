@@ -1,37 +1,40 @@
+from flask import Flask, render_template
+from extensions import db
+from flask_migrate import Migrate
+from config import Config
+import os
+
 """
 Application entry point.
 """
-
-
-import os
-# Import the Flask framework and related functions for creating the app, handling redirects, rendering templates, and generating URLs
-from flask import Flask, redirect, render_template, url_for
 
 # Use package imports
 from .config import Config
 from .extensions import db, migrate
 
+# Configure Flask to reuse the existing prototype templates and static files
 app = Flask(__name__, template_folder="../frontend/template", static_folder="../frontend/static")
 
-app.config.from_object(Config) # Load configuration from the Config class in config.py
 
-db.init_app(app) # Initialize the SQLAlchemy extension with the Flask app
+# set the configuration through the object Config in the config.py
+app.config.from_object(Config)
+# create a folder named instance
+os.makedirs(app.instance_path, exist_ok=True)
+
+# bind SQLAlchemy with app
+db.init_app(app)
 migrate.init_app(
     app,
     db,
     directory=os.path.join(app.root_path, "migrations")
 ) # Use backend/migrations as the migration directory
 
-# Import models so Flask-Migrate can detect all tables
-from . import models
 
 @app.route("/")
 @app.route("/index.html")
 def index():
     """Render the home page prototype"""
     return render_template("index.html")
-
-
 
 @app.route("/explore")
 def explore_alias():
