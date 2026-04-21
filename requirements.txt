@@ -1,14 +1,29 @@
-alembic==1.18.4
-blinker==1.9.0
-click==8.3.2
+# Web framework
 Flask==3.1.3
-Flask-Migrate==4.1.0
+
+# Jinja2 template engine (Flask dependency)
+Jinja2==3.1.6
+MarkupSafe==3.0.3
+
+# Flask utilities (Flask dependencies)
+Werkzeug==3.1.8
+click==8.3.2
+itsdangerous==2.2.0
+blinker==1.9.0
+
+# Database ORM
 Flask-SQLAlchemy==3.1.1
+SQLAlchemy==2.0.49
+
+# Database migrations
+Flask-Migrate==4.1.0
+alembic==1.18.4
+Mako==1.3.11
+
+# Type hints
+typing_extensions==4.15.0
+
+
 greenlet==3.4.0
 itsdangerous==2.2.0
-Jinja2==3.1.6
-Mako==1.3.11
-MarkupSafe==3.0.3
-SQLAlchemy==2.0.49
-typing_extensions==4.15.0
-Werkzeug==3.1.8
+
