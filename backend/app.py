@@ -4,11 +4,13 @@ Application entry point.
 
 import os
 
-from flask import Flask, redirect, render_template, url_for
+from flask import Flask, flash, redirect, render_template, request, session, url_for
+from werkzeug.security import check_password_hash, generate_password_hash
 
 from .config import Config
 from .extensions import db, migrate
 from . import models  # noqa: F401
+from .models import User
 
 
 # Configure Flask to reuse the existing prototype templates and static files
@@ -76,22 +78,115 @@ def profile():
     return render_template("profile.html")
 
 
+# Original prototype-only login route:
+# @app.route("/login")
+# def login_alias():
+#     return redirect(url_for("login"))
+#
+# @app.route("/login.html")
+# def login():
+#     """Render the login page prototype"""
+#     return render_template("login.html")
+
+
 @app.route("/login")
 def login_alias():
+    """Redirect to the login page"""
     return redirect(url_for("login"))
-@app.route("/login.html")
+
+
+@app.route("/login.html", methods=["GET", "POST"])
 def login():
-    """Render the login page prototype"""
-    return render_template("login.html")
+    """Log in an existing user and store their identity in the session."""
+    if request.method == "POST":
+        identifier = request.form.get("identifier", "").strip()
+        password = request.form.get("password", "")
+        form_data = {"identifier": identifier}
+
+        if not identifier or not password:
+            flash("Please enter your username/email and password.", "danger")
+            return render_template("login.html", form_data=form_data)
+
+        user = User.query.filter(
+            (User.username == identifier) | (User.email == identifier.lower())
+        ).first()
+
+        if not user or not check_password_hash(user.password_hash, password):
+            flash("Invalid username/email or password.", "danger")
+            return render_template("login.html", form_data=form_data)
+
+        session.clear()
+        session["user_id"] = user.id
+        session["username"] = user.username
+
+        flash("Logged in successfully.", "success")
+        return redirect(url_for("index"))
+
+    return render_template("login.html", form_data={})
+
+
+@app.route("/logout")
+def logout():
+    """Log out the current user by clearing the session."""
+    session.clear()
+    flash("You have been logged out.", "success")
+    return redirect(url_for("index"))
+
+
+# Original prototype-only register route:
+# @app.route("/register")
+# def register_alias():
+#     """Redirect to the registration page prototype"""
+#     return redirect(url_for("register"))
+#
+# @app.route("/register.html")
+# def register():
+#     return render_template("register.html")
 
 
 @app.route("/register")
 def register_alias():
-    """Redirect to the registration page prototype"""
+    """Redirect to the registration page"""
     return redirect(url_for("register"))
-@app.route("/register.html")
+@app.route("/register.html", methods=["GET", "POST"])
 def register():
-    return render_template("register.html")
+    """Create a new user account from the registration form."""
+    if request.method == "POST":
+        username = request.form.get("username", "").strip()
+        email = request.form.get("email", "").strip().lower()
+        password = request.form.get("password", "")
+        confirm_password = request.form.get("confirm_password", "")
+
+        form_data = {"username": username, "email": email}
+
+        if not username or not email or not password or not confirm_password:
+            flash("Please complete all required fields.", "danger")
+            return render_template("register.html", form_data=form_data)
+
+        if password != confirm_password:
+            flash("Passwords do not match!", "danger")
+            return render_template("register.html", form_data=form_data)
+
+        existing_user = User.query.filter(
+            (User.username == username) | (User.email == email)
+        ).first()
+
+        if existing_user:
+            flash("Username or email is already registered.", "danger")
+            return render_template("register.html", form_data=form_data)
+
+        user = User(
+            username=username,
+            email=email,
+            password_hash=generate_password_hash(password),
+        )
+        db.session.add(user) # Add the new user to the session
+        db.session.commit() # Commit the session to save the user to the database
+
+        flash("Account created successfully. Please log in.", "success")
+        return redirect(url_for("login"))
+
+    return render_template("register.html", form_data={})
 
 @app.route("/navbar.html")
 def navbar():
