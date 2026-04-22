@@ -21,6 +21,15 @@ sharing, and saving local places around Perth.
 
 Run all commands from the project root directory.
 
+### Install the Dependencies
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install --upgrade pip
+pip install -r requirements.txt
+```
+
 ### Option 1: Run the Application with existing Database
 
 ```bash
