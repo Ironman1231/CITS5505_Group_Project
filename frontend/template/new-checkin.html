@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>New Check-in — PerthPins</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="../static/css/common.css" />
+  <link rel="stylesheet" href="../static/css/new-checkin.css" />
+</head>
+<body>
+
+<!--
+<div id="navbar-placeholder"></div>
+-->
+{% include "navbar.html" %}
+
+
+<!-- Page header -->
+<div class="bg-white border-bottom py-4">
+  <div class="container">
+    <h1 class="h3 fw-bold mb-0 text-green">
+      <i class="bi bi-plus-circle me-2"></i>Share Your Discovery
+    </h1>
+    <p class="text-muted mb-0 mt-1 small">Pin a new place on the map and tell the community about it</p>
+  </div>
+</div>
+
+
+<main class="container py-4">
+  <div class="row g-4">
+
+    <!-- ===== FORM COLUMN ===== -->
+    <div class="col-lg-7">
+      <div class="bg-white rounded-3 shadow-sm p-4">
+        <form id="checkin-form" novalidate>
+          <!-- Hidden rating input -->
+          <input type="hidden" name="rating" id="rating-value" value="0" />
+
+          <!-- 1. Place name / location -->
+          <div class="mb-4">
+            <label for="place-name" class="form-label fw-semibold">
+              <i class="bi bi-geo-alt me-1 text-green"></i>Place Name
+            </label>
+            <div class="input-group">
+              <input type="text" class="form-control" id="place-name"
+                     placeholder="e.g. Matilda Bay, Kings Park..." required />
+              <button class="btn btn-outline-secondary" type="button" id="pick-on-map">
+                <i class="bi bi-map me-1"></i>Pick on Map
+              </button>
+            </div>
+            <div class="form-text">Type a name or click the button to select on the map below.</div>
+          </div>
+
+          <!-- Map picker (collapsed by default, toggled by the button) -->
+          <div class="mb-4" id="map-picker-wrap" style="display:none;">
+            <label class="form-label fw-semibold small">
+              <i class="bi bi-cursor me-1 text-green"></i>Select Location on Map
+              <span class="text-muted fw-normal">(click the map to drop a pin)</span>
+            </label>
+            <div id="map-picker" class="border rounded"></div>
+            <div id="map-coords" class="form-text mt-1">No location selected yet.</div>
+          </div>
+
+          <!-- 2. Photos -->
+          <div class="mb-4">
+            <label class="form-label fw-semibold">
+              <i class="bi bi-camera me-1 text-green"></i>Photos
+            </label>
+            <label for="photo-input" class="photo-preview-area d-block">
+              <i class="bi bi-cloud-upload fs-2 text-muted"></i>
+              <div class="mt-2 text-muted">Click to upload photos</div>
+              <div class="text-muted small">PNG, JPG up to 5 MB each</div>
+            </label>
+            <input type="file" class="d-none" id="photo-input" multiple accept="image/*" />
+            <div id="photo-previews" class="mt-2 d-flex flex-wrap"></div>
+          </div>
+
+          <!-- 3. Title -->
+          <div class="mb-4">
+            <label for="title" class="form-label fw-semibold">
+              <i class="bi bi-pencil me-1 text-green"></i>Title
+            </label>
+            <input type="text" class="form-control" id="title"
+                   placeholder="Give your check-in a short title..." required />
+          </div>
+
+          <!-- 4. Category -->
+          <div class="mb-4">
+            <label for="category" class="form-label fw-semibold">
+              <i class="bi bi-tag me-1 text-green"></i>Category
+            </label>
+            <select class="form-select" id="category" required>
+              <option value="" disabled selected>Choose a category</option>
+              <option value="food">Food &amp; Drink</option>
+              <option value="study">Study Spot</option>
+              <option value="nature">Nature</option>
+              <option value="nightlife">Nightlife</option>
+              <option value="shopping">Shopping</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+
+          <!-- 5. Star rating -->
+          <div class="mb-4">
+            <label class="form-label fw-semibold d-block">
+              <i class="bi bi-star me-1 text-green"></i>Your Rating
+            </label>
+            <div class="star-picker" id="star-picker">
+              <i class="bi bi-star" data-value="1"></i>
+              <i class="bi bi-star" data-value="2"></i>
+              <i class="bi bi-star" data-value="3"></i>
+              <i class="bi bi-star" data-value="4"></i>
+              <i class="bi bi-star" data-value="5"></i>
+            </div>
+            <div class="form-text">Click a star to rate (1 = poor, 5 = excellent)</div>
+          </div>
+
+          <!-- 6. Description -->
+          <div class="mb-4">
+            <label for="description" class="form-label fw-semibold">
+              <i class="bi bi-card-text me-1 text-green"></i>Description
+            </label>
+            <textarea class="form-control" id="description" rows="5"
+                      placeholder="Tell others what makes this place special — what to expect, best time to visit, tips..." required></textarea>
+          </div>
+
+          <!-- Submit -->
+          <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+            <a href="explore.html" class="btn btn-outline-secondary px-4">Cancel</a>
+            <button type="submit" class="btn btn-pp px-5">
+              <i class="bi bi-send me-1"></i>Publish Check-in
+            </button>
+          </div>
+
+        </form>
+      </div>
+    </div><!-- /form column -->
+
+
+    <!-- ===== PREVIEW COLUMN ===== -->
+    <div class="col-lg-5">
+      <div class="position-sticky" style="top:80px;">
+
+        <!-- Preview card -->
+        <p class="fw-semibold text-muted small mb-2">
+          <i class="bi bi-eye me-1"></i>Live Preview
+        </p>
+        <div class="card checkin-card">
+          <img src="https://picsum.photos/400/220?random=61" class="card-img-top" id="preview-img" alt="preview" />
+          <div class="card-body">
+            <span class="badge badge-nature mb-2" id="preview-badge">Nature</span>
+            <h5 class="card-title" id="preview-title">Your Place Name</h5>
+            <div class="stars mb-1" id="preview-stars">
+              <i class="bi bi-star"></i><i class="bi bi-star"></i>
+              <i class="bi bi-star"></i><i class="bi bi-star"></i>
+              <i class="bi bi-star"></i>
+              <small class="text-muted ms-1" id="preview-rating">-</small>
+            </div>
+            <p class="card-text small" id="preview-desc">Your description will appear here...</p>
+            <div class="d-flex align-items-center mt-2">
+              <img src="https://picsum.photos/30/30?random=101" class="rounded-circle me-2" width="24" height="24" alt="you" style="object-fit:cover;" />
+              <small class="text-muted">You</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tips -->
+        <div class="bg-white rounded-3 shadow-sm p-3 mt-4">
+          <h6 class="fw-bold mb-2 text-green"><i class="bi bi-lightbulb me-1"></i>Tips for a great check-in</h6>
+          <ul class="small text-muted mb-0 ps-3">
+            <li>Add at least one clear photo</li>
+            <li>Mention the best time to visit</li>
+            <li>Include practical details (parking, opening hours)</li>
+            <li>Be honest with your rating</li>
+          </ul>
+        </div>
+
+      </div>
+    </div><!-- /preview column -->
+
+  </div><!-- /row -->
+</main>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="../static/js/common.js"></script>
+<!--
+<script>loadComponent('navbar-placeholder', 'navbar.html');</script>
+-->
+
+<script>
+  /* ---- Map picker ---- */
+  let pickerMap = null;
+  let pickerMarker = null;
+
+  document.getElementById('pick-on-map').addEventListener('click', function () {
+    const wrap = document.getElementById('map-picker-wrap');
+    wrap.style.display = wrap.style.display === 'none' ? 'block' : 'none';
+
+    if (wrap.style.display === 'block' && !pickerMap) {
+      pickerMap = L.map('map-picker').setView([-31.9505, 115.8605], 13);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+      }).addTo(pickerMap);
+
+      pickerMap.on('click', function (e) {
+        const { lat, lng } = e.latlng;
+        if (pickerMarker) pickerMap.removeLayer(pickerMarker);
+        pickerMarker = L.marker([lat, lng]).addTo(pickerMap);
+        document.getElementById('map-coords').textContent =
+          `Selected: ${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+      });
+    } else if (pickerMap) {
+      pickerMap.invalidateSize(); // fix tile rendering after show
+    }
+  });
+
+  /* ---- Live preview: title ---- */
+  document.getElementById('title').addEventListener('input', function () {
+    const val = this.value.trim();
+    document.getElementById('preview-title').textContent = val || 'Your Place Name';
+  });
+
+  /* ---- Live preview: description ---- */
+  document.getElementById('description').addEventListener('input', function () {
+    const val = this.value.trim();
+    const short = val.length > 100 ? val.substring(0, 100) + '...' : val;
+    document.getElementById('preview-desc').textContent = short || 'Your description will appear here...';
+  });
+
+  /* ---- Live preview: category badge ---- */
+  const catMap = {
+    food: ['badge-food', 'Food & Drink'],
+    study: ['badge-study', 'Study Spot'],
+    nature: ['badge-nature', 'Nature'],
+    nightlife: ['badge-nightlife', 'Nightlife'],
+    shopping: ['badge-shopping', 'Shopping'],
+    other: ['badge-other', 'Other']
+  };
+
+  document.getElementById('category').addEventListener('change', function () {
+    const badge = document.getElementById('preview-badge');
+    const [cls, label] = catMap[this.value] || ['badge-other', 'Other'];
+    badge.className = 'badge mb-2 ' + cls;
+    badge.textContent = label;
+  });
+
+  /* ---- Star rating picker ---- */
+  const starPicker = document.getElementById('star-picker');
+  const starIcons  = starPicker.querySelectorAll('[data-value]');
+
+  function renderPickerStars(filled) {
+    starIcons.forEach(function (s) {
+      const v = parseInt(s.dataset.value);
+      s.className = v <= filled ? 'bi bi-star-fill' : 'bi bi-star';
+    });
+  }
+
+  function renderPreviewStars(val) {
+    let html = '';
+    for (let i = 1; i <= 5; i++) {
+      html += i <= val ? '<i class="bi bi-star-fill"></i>' : '<i class="bi bi-star"></i>';
+    }
+    html += '<small class="text-muted ms-1">' + val + '</small>';
+    document.getElementById('preview-stars').innerHTML = html;
+  }
+
+  // Hover: preview fill
+  starPicker.addEventListener('mouseover', function (e) {
+    const star = e.target.closest('[data-value]');
+    if (star) renderPickerStars(parseInt(star.dataset.value));
+  });
+
+  // Mouse leave: restore current rating
+  starPicker.addEventListener('mouseleave', function () {
+    renderPickerStars(parseInt(document.getElementById('rating-value').value) || 0);
+  });
+
+  // Click: commit rating
+  starPicker.addEventListener('click', function (e) {
+    const star = e.target.closest('[data-value]');
+    if (!star) return;
+    const val = parseInt(star.dataset.value);
+    document.getElementById('rating-value').value = val;
+    renderPickerStars(val);
+    renderPreviewStars(val);
+  });
+
+  /* ---- Form submit feedback ---- */
+  document.getElementById('checkin-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (!this.checkValidity()) {
+      this.classList.add('was-validated');
+      return;
+    }
+    // Simulate success
+    alert('Check-in published! (Demo — redirecting to home)');
+    window.location.href = 'index.html';
+  });
+</script>
+
+</body>
+</html>

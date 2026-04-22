@@ -6,12 +6,16 @@
   <title>Matilda Bay — PerthPins</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <link rel="stylesheet" href="css/common.css" />
-  <link rel="stylesheet" href="css/detail.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <link rel="stylesheet" href="../static/css/common.css" />
+  <link rel="stylesheet" href="../static/css/detail.css" />
 </head>
 <body>
 
+<!--
 <div id="navbar-placeholder"></div>
+-->
+{% include "navbar.html" %}
 
 <main class="container py-4">
 
@@ -55,12 +59,22 @@
         <p class="place-rating mb-0">Rating: 4.5 / 5</p>
       </div>
 
-      <div class="author-info mb-4">
-        <img src="https://picsum.photos/50/50?random=101" width="40" height="40" class="rounded-circle author-avatar" alt="perthwanderer" />
-        <a href="profile.html" class="author-name">perthwanderer</a>
-        <span class="text-muted small post-date">Posted 12 March 2025 | Crawley, Perth</span>
-        <button type="button" class="btn btn-sm btn-outline-secondary action-btn">Favourite</button>
-        <button type="button" class="btn btn-sm btn-outline-secondary action-btn">Share</button>
+      <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-4">
+        <div class="d-flex align-items-center gap-2">
+          <img src="https://picsum.photos/50/50?random=101" width="40" height="40" class="rounded-circle author-avatar" alt="perthwanderer" />
+          <div>
+            <a href="profile.html" class="author-name fw-semibold d-block">perthwanderer</a>
+            <span class="text-muted small post-date">Posted 12 March 2025 · Crawley, Perth</span>
+          </div>
+        </div>
+        <div class="d-flex gap-2">
+          <button type="button" class="btn btn-sm btn-outline-danger">
+            <i class="bi bi-heart me-1"></i>Favourite
+          </button>
+          <button type="button" class="btn btn-sm btn-outline-secondary">
+            <i class="bi bi-share me-1"></i>Share
+          </button>
+        </div>
       </div>
 
       <div class="place-description mb-4">
@@ -140,7 +154,7 @@
 
     <div class="col-lg-4">
 
-      <div class="location-card bg-white border overflow-hidden mb-4">
+      <div class="location-card bg-white border mb-4">
         <div class="p-3 border-bottom">
           <h6 class="fw-bold mb-0">Location</h6>
         </div>
@@ -189,9 +203,11 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="js/detail.js"></script>
-<script src="js/common.js"></script>
+<script src="../static/js/details.js"></script>
+<script src="../static/js/common.js"></script>
+<!--
 <script>loadComponent('navbar-placeholder', 'navbar.html');</script>
+-->
 
 </body>
 </html>
