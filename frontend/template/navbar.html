@@ -39,8 +39,17 @@
         -->
         <a href="{{ url_for('new_checkin') }}" class="btn btn-pp btn-sm">+ New Check-in</a>
         <a href="{{ url_for('checkin_details') }}" class="btn btn-pp btn-sm">+ New Check-in</a>
+        <!-- Original Jinja auth buttons before login state was connected:
         <a href="{{ url_for('login') }}" class="btn btn-outline-secondary btn-sm">Log In</a>
         <a href="{{ url_for('register') }}" class="btn btn-outline-secondary btn-sm">Register</a>
+        -->
+        {% if session.get("user_id") %}
+          <span class="navbar-text small text-muted">Logged in as {{ session.get("username") }}</span>
+          <a href="{{ url_for('logout') }}" class="btn btn-outline-secondary btn-sm">Log Out</a>
+        {% else %}
+          <a href="{{ url_for('login') }}" class="btn btn-outline-secondary btn-sm">Log In</a>
+          <a href="{{ url_for('register') }}" class="btn btn-outline-secondary btn-sm">Register</a>
+        {% endif %}
       </div>
     </div>
   </div>
