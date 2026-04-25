@@ -26,7 +26,7 @@
       <p class="text-white mb-0 fw-semibold fs-5">
         Discover &amp; share hidden gems around Perth and UWA
       </p>
-      <a href="new-checkin.html" class="btn btn-pp ms-auto">Share Your Discovery</a>
+      <a id="share_post" href="new-checkin.html" class="btn btn-pp ms-auto">Share Your Discovery</a>
     </div>
   </div>
 </div>
@@ -125,6 +125,26 @@
     <a href="explore.html" class="btn btn-outline-secondary px-4">View All Check-ins</a>
   </div>
 
+  <!-- the notification to login when clicking push post button under unlogin status -->
+   <div class="modal fade" id="login_modal">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Login Required</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+
+        <div class="modal-body">
+          You need to be logged in to create a check-in
+        </div>
+        <div class="modal-footer">
+          <a href="{{ url_for('login') }}" class="btn btn-primary">Log In</a>
+          <a href="{{ url_for('register') }}" class="btn btn-outline-secondary">Register</a>
+        </div>
+      </div>
+    </div>
+   </div>
+
 </main>
 
 
@@ -135,9 +155,18 @@
     crossorigin=""></script>
 <script src="../static/js/home.js"></script>
 <script src="../static/js/common.js"></script>
-<!--
-<script>loadComponent('navbar-placeholder', 'navbar.html');</script>
--->
+
+<script>
+  // jinja2 statements cannote be written in .js file, so it has to be written in .html file
+  document.getElementById("share_post").addEventListener("click", (e) => {
+    {% if not session.get("user_id") %}
+      e.preventDefault()
+      // display the notification
+      const modal = new bootstrap.Modal(document.getElementById("login_modal"));
+      modal.show()
+    {% endif %}
+  })
+</script>
 
 </body>
 </html>
