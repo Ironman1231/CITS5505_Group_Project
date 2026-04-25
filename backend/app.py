@@ -10,7 +10,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from .config import Config
 from .extensions import db, migrate
 from . import models  # noqa: F401
-from .models import User
+from .models import User, CheckIn
 
 
 # Configure Flask to reuse the existing prototype templates and static files
@@ -69,6 +69,29 @@ def new_checkin():
     if request.method == "POST":
         if not session.get("user_id"):
             return render_template(url_for("new_checkin"), login_status=False)
+        title = request.form.get("title")
+        lat = float(request.form.get("lat"))
+        lng = float(request.form.get("lng"))
+        form_data = {
+            "user_id": session["user_id"],
+            "title": title,
+            "lat": lat,
+            "lng": lng
+        }
+
+        user = User.query.filter(
+            (User.id == form_data["user_id"])
+        ).first()
+
+        check_in = CheckIn(
+            user_id = user.id,
+            title = title,
+            lat = lat,
+            lng = lng
+        )
+
+        db.session.add(check_in)
+        db.session.commit()
         
 
     """Render the new check-in page prototype"""

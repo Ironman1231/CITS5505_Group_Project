@@ -65,8 +65,8 @@
             <div id="map-coords" class="form-text mt-1">No location selected yet.</div>
 
             <!-- The hidden input from leaflet map, which backend can directly get the latitude and longitude the user choose. -->
-            <input type="hidden" id="lat-input" name="lat">
-            <input type="hidden" id="lng-input" name="lng">
+            <input type="hidden" id="lat_input" name="lat">
+            <input type="hidden" id="lng_input" name="lng">
           </div>
 
           <!-- 2. Photos -->
@@ -89,7 +89,7 @@
               <i class="bi bi-pencil me-1 text-green"></i>Title
             </label>
             <input type="text" class="form-control" id="title"
-                   placeholder="Give your check-in a short title..." required />
+                   placeholder="Give your check-in a short title..." name="title" required />
           </div>
 
           <!-- 4. Category -->
@@ -218,8 +218,14 @@
         const { lat, lng } = e.latlng;
         if (pickerMarker) pickerMap.removeLayer(pickerMarker);
         pickerMarker = L.marker([lat, lng]).addTo(pickerMap);
-        document.getElementById('map-coords').textContent =
-          `Selected: ${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+        document.getElementById('map-coords').textContent = `
+        Selected: ${lat.toFixed(5)}, ${lng.toFixed(5)}
+        `;
+        
+        // Save the value of latitude and longitude to the hidden input
+        document.getElementById("lat_input").value = lat;
+        document.getElementById("lng_input").value = lng;
+          
       });
     } else if (pickerMap) {
       pickerMap.invalidateSize(); // fix tile rendering after show
