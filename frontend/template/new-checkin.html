@@ -36,7 +36,7 @@
     <!-- ===== FORM COLUMN ===== -->
     <div class="col-lg-7">
       <div class="bg-white rounded-3 shadow-sm p-4">
-        <form id="checkin-form" novalidate>
+        <form id="checkin-form" action="{{ url_for('new_checkin') }}" method="post" novalidate>
           <!-- Hidden rating input -->
           <input type="hidden" name="rating" id="rating-value" value="0" />
 
@@ -63,6 +63,10 @@
             </label>
             <div id="map-picker" class="border rounded"></div>
             <div id="map-coords" class="form-text mt-1">No location selected yet.</div>
+
+            <!-- The hidden input from leaflet map, which backend can directly get the latitude and longitude the user choose. -->
+            <input type="hidden" id="lat-input" name="lat">
+            <input type="hidden" id="lng-input" name="lng">
           </div>
 
           <!-- 2. Photos -->
@@ -183,6 +187,8 @@
     </div><!-- /preview column -->
 
   </div><!-- /row -->
+
+  {% include "login_popup.html" %}
 </main>
 
 
@@ -292,16 +298,21 @@
   });
 
   /* ---- Form submit feedback ---- */
-  document.getElementById('checkin-form').addEventListener('submit', function (e) {
-    e.preventDefault();
-    if (!this.checkValidity()) {
-      this.classList.add('was-validated');
-      return;
-    }
-    // Simulate success
-    alert('Check-in published! (Demo — redirecting to home)');
-    window.location.href = 'index.html';
-  });
+  // document.getElementById('checkin-form').addEventListener('submit', function (e) {
+  //   e.preventDefault();
+  //   if (!this.checkValidity()) {
+  //     this.classList.add('was-validated');
+  //     return;
+  //   }
+  //   // Simulate success
+  //   alert('Check-in published! (Demo — redirecting to home)');
+  //   window.location.href = 'index.html';
+  // });
+
+  {% if login_status == False %}
+    const modal = new bootstrap.Modal(document.getElementById("login_modal"));
+    modal.show()
+  {% endif %}
 </script>
 
 </body>

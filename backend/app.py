@@ -63,8 +63,14 @@ def checkin_details():
 @app.route("/new-checkin")
 def new_checkin_alias():
     return redirect(url_for("new_checkin"))
-@app.route("/new-checkin.html")
+
+@app.route("/new-checkin.html", methods=["GET", "POST"])
 def new_checkin():
+    if request.method == "POST":
+        if not session.get("user_id"):
+            return render_template(url_for("new_checkin"), login_status=False)
+        
+
     """Render the new check-in page prototype"""
     return render_template("new-checkin.html")
 

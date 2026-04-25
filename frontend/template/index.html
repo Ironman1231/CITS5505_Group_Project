@@ -125,25 +125,7 @@
     <a href="explore.html" class="btn btn-outline-secondary px-4">View All Check-ins</a>
   </div>
 
-  <!-- the notification to login when clicking push post button under unlogin status -->
-   <div class="modal fade" id="login_modal">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Login Required</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-
-        <div class="modal-body">
-          You need to be logged in to create a check-in
-        </div>
-        <div class="modal-footer">
-          <a href="{{ url_for('login') }}" class="btn btn-primary">Log In</a>
-          <a href="{{ url_for('register') }}" class="btn btn-outline-secondary">Register</a>
-        </div>
-      </div>
-    </div>
-   </div>
+  {% include "login_popup.html" %}
 
 </main>
 
