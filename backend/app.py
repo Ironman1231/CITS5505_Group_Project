@@ -40,7 +40,9 @@ migrate.init_app(
 @app.route("/index.html")
 def index():
     """Render the home page prototype"""
-    return render_template("index.html")
+    new_check_ins = CheckIn.query.all()
+
+    return render_template("index.html", check_ins = new_check_ins)
 
 @app.route("/explore")
 def explore_alias():
@@ -69,29 +71,39 @@ def new_checkin():
     if request.method == "POST":
         if not session.get("user_id"):
             return render_template(url_for("new_checkin"), login_status=False)
+        
+        # get information from the front end by id
         title = request.form.get("title")
+        category = request.form.get("category")
         lat = float(request.form.get("lat"))
         lng = float(request.form.get("lng"))
+
+        # for all data into a dictionary
         form_data = {
             "user_id": session["user_id"],
             "title": title,
+            "category": category,
             "lat": lat,
             "lng": lng
         }
 
+        # get the user id who issue this post
         user = User.query.filter(
             (User.id == form_data["user_id"])
         ).first()
 
         check_in = CheckIn(
             user_id = user.id,
-            title = title,
-            lat = lat,
-            lng = lng
+            title = form_data["title"],
+            category = form_data["category"],
+            lat = form_data["lat"],
+            lng = form_data["lng"]
         )
 
         db.session.add(check_in)
         db.session.commit()
+
+        return redirect(url_for("index"))
         
 
     """Render the new check-in page prototype"""

@@ -39,8 +39,31 @@
 
   <div class="row g-4">
 
+    {% for check_in in check_ins %}
+
+      <div class="col-sm-6 col-lg-4 col-xl-3">
+        <div class="card checkin-card h-100">
+          <img src="https://picsum.photos/400/300?random=11" class="card-img-top" alt="Matilda Bay" />
+          <div class="card-body">
+            <span class="cat-label cat-nature mb-1">{{ check_in.category }}</span>
+            <h5 class="card-title">{{ check_in.title }}</h5>
+            <div class="mb-1"><span class="rating-num">4.5</span></div>
+            <p class="card-text">Sunset views just beside UWA campus are absolutely stunning...</p>
+            <div class="d-flex align-items-center justify-content-between mt-2">
+              <small class="text-muted">{{ check_in.user_id }}</small>
+              <button class="btn btn-sm btn-outline-secondary btn-fav">Favourite</button>
+            </div>
+          </div>
+          <div class="card-footer bg-transparent border-0 pt-0">
+            <a href="checkin_details.html" class="btn btn-sm btn-outline-secondary w-100">View Details</a>
+          </div>
+        </div>
+      </div>
+
+    {% endfor %}
+
     <!-- CARD 1 — Matilda Bay -->
-    <div class="col-sm-6 col-lg-4 col-xl-3">
+    <!-- <div class="col-sm-6 col-lg-4 col-xl-3">
       <div class="card checkin-card h-100">
         <img src="https://picsum.photos/400/300?random=11" class="card-img-top" alt="Matilda Bay" />
         <div class="card-body">
@@ -57,10 +80,10 @@
           <a href="checkin_details.html" class="btn btn-sm btn-outline-secondary w-100">View Details</a>
         </div>
       </div>
-    </div>
+    </div> -->
 
     <!-- CARD 2 — Kings Park Botanic Garden -->
-    <div class="col-sm-6 col-lg-4 col-xl-3">
+    <!-- <div class="col-sm-6 col-lg-4 col-xl-3">
       <div class="card checkin-card h-100">
         <img src="https://picsum.photos/400/300?random=12" class="card-img-top" alt="Kings Park" />
         <div class="card-body">
@@ -77,10 +100,10 @@
           <a href="#" class="btn btn-sm btn-outline-secondary w-100">View Details</a>
         </div>
       </div>
-    </div>
+    </div> -->
 
     <!-- CARD 3 — Chicho Gelato -->
-    <div class="col-sm-6 col-lg-4 col-xl-3">
+    <!-- <div class="col-sm-6 col-lg-4 col-xl-3">
       <div class="card checkin-card h-100">
         <img src="https://picsum.photos/400/300?random=13" class="card-img-top" alt="Chicho Gelato" />
         <div class="card-body">
@@ -97,10 +120,10 @@
           <a href="#" class="btn btn-sm btn-outline-secondary w-100">View Details</a>
         </div>
       </div>
-    </div>
+    </div> -->
 
     <!-- CARD 4 — Reid Library -->
-    <div class="col-sm-6 col-lg-4 col-xl-3">
+    <!-- <div class="col-sm-6 col-lg-4 col-xl-3">
       <div class="card checkin-card h-100">
         <img src="https://picsum.photos/400/300?random=14" class="card-img-top" alt="Reid Library" />
         <div class="card-body">
@@ -117,7 +140,7 @@
           <a href="#" class="btn btn-sm btn-outline-secondary w-100">View Details</a>
         </div>
       </div>
-    </div>
+    </div> -->
 
   </div><!-- /row -->
 
