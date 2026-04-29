@@ -36,7 +36,7 @@
     <!-- ===== FORM COLUMN ===== -->
     <div class="col-lg-7">
       <div class="bg-white rounded-3 shadow-sm p-4">
-        <form id="checkin-form" action="{{ url_for('new_checkin') }}" method="post" novalidate>
+        <form id="checkin-form" method="POST" action="{{ url_for('new_checkin') }}" novalidate>
           <!-- Hidden rating input -->
           <input type="hidden" name="rating" id="rating-value" value="0" />
 

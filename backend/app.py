@@ -231,7 +231,10 @@ def register():
         return redirect(url_for("login"))
 
     return render_template("register.html", form_data={})
-
+@app.route("/search")
+def search():
+    query = request.args.get("q", "").strip()
+    return render_template("explore.html", search_query=query)
 @app.route("/navbar.html")
 def navbar():
     """Render the navigation bar prototype"""
