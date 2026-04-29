@@ -27,9 +27,9 @@
           <a class="nav-link{% if request.endpoint == 'profile' %} active{% endif %}" href="{{ url_for('profile') }}">My Profile</a>
         </li>
       </ul>
-      <form class="d-flex me-3" role="search">
-        <input type="search" class="form-control form-control-sm" placeholder="Search places..." style="width:180px;" />
-        <button class="btn btn-outline-secondary btn-sm ms-1" type="button">Search</button>
+      <form class="d-flex me-3" role="search" action="{{ url_for('search') }}" method="GET">
+        <input type="search" name="q" class="form-control form-control-sm" placeholder="Search places..." style="width:180px;" />
+        <button class="btn btn-outline-secondary btn-sm ms-1" type="submit">Search</button>
       </form>
       <div class="d-flex gap-2">
         <!--
@@ -38,7 +38,6 @@
         <a href="register.html" class="btn btn-outline-secondary btn-sm">Register</a>
         -->
         <a href="{{ url_for('new_checkin') }}" class="btn btn-pp btn-sm">+ New Check-in</a>
-        <a href="{{ url_for('checkin_details') }}" class="btn btn-pp btn-sm">+ New Check-in</a>
         <!-- Original Jinja auth buttons before login state was connected:
         <a href="{{ url_for('login') }}" class="btn btn-outline-secondary btn-sm">Log In</a>
         <a href="{{ url_for('register') }}" class="btn btn-outline-secondary btn-sm">Register</a>
