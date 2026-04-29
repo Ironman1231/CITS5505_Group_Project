@@ -75,6 +75,7 @@ def new_checkin():
         # get information from the front end by id
         title = request.form.get("title")
         category = request.form.get("category")
+        description = request.form.get("description")
         lat = float(request.form.get("lat"))
         lng = float(request.form.get("lng"))
 
@@ -82,6 +83,7 @@ def new_checkin():
         form_data = {
             "user_id": session["user_id"],
             "title": title,
+            "description": description,
             "category": category,
             "lat": lat,
             "lng": lng
@@ -95,6 +97,7 @@ def new_checkin():
         check_in = CheckIn(
             user_id = user.id,
             title = form_data["title"],
+            description = form_data["description"],
             category = form_data["category"],
             lat = form_data["lat"],
             lng = form_data["lng"]

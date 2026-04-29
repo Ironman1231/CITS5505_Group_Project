@@ -48,7 +48,13 @@
             <span class="cat-label cat-nature mb-1">{{ check_in.category }}</span>
             <h5 class="card-title">{{ check_in.title }}</h5>
             <div class="mb-1"><span class="rating-num">4.5</span></div>
-            <p class="card-text">Sunset views just beside UWA campus are absolutely stunning...</p>
+            <p class="card-text">
+              {% if check_in.description | length <= 50 %}
+                {{ check_in.description }}
+              {% else %}
+                {{ check_in.description[:50] + "..." }}
+              {% endif %}
+            </p>
             <div class="d-flex align-items-center justify-content-between mt-2">
               <small class="text-muted">{{ check_in.user_id }}</small>
               <button class="btn btn-sm btn-outline-secondary btn-fav">Favourite</button>
