@@ -63,6 +63,10 @@
             </label>
             <div id="map-picker" class="border rounded"></div>
             <div id="map-coords" class="form-text mt-1">No location selected yet.</div>
+
+            <!-- The hidden input from leaflet map, which backend can directly get the latitude and longitude the user choose. -->
+            <input type="hidden" id="lat_input" name="lat">
+            <input type="hidden" id="lng_input" name="lng">
           </div>
 
           <!-- 2. Photos -->
@@ -85,7 +89,7 @@
               <i class="bi bi-pencil me-1 text-green"></i>Title
             </label>
             <input type="text" class="form-control" id="title"
-                   placeholder="Give your check-in a short title..." required />
+                   placeholder="Give your check-in a short title..." name="title" required />
           </div>
 
           <!-- 4. Category -->
@@ -93,7 +97,7 @@
             <label for="category" class="form-label fw-semibold">
               <i class="bi bi-tag me-1 text-green"></i>Category
             </label>
-            <select class="form-select" id="category" required>
+            <select class="form-select" id="category" name="category" required>
               <option value="" disabled selected>Choose a category</option>
               <option value="food">Food &amp; Drink</option>
               <option value="study">Study Spot</option>
@@ -125,7 +129,7 @@
               <i class="bi bi-card-text me-1 text-green"></i>Description
             </label>
             <textarea class="form-control" id="description" rows="5"
-                      placeholder="Tell others what makes this place special — what to expect, best time to visit, tips..." required></textarea>
+                      placeholder="Tell others what makes this place special — what to expect, best time to visit, tips..." name="description" required></textarea>
           </div>
 
           <!-- Submit -->
@@ -183,6 +187,8 @@
     </div><!-- /preview column -->
 
   </div><!-- /row -->
+
+  {% include "login_popup.html" %}
 </main>
 
 
@@ -212,8 +218,14 @@
         const { lat, lng } = e.latlng;
         if (pickerMarker) pickerMap.removeLayer(pickerMarker);
         pickerMarker = L.marker([lat, lng]).addTo(pickerMap);
-        document.getElementById('map-coords').textContent =
-          `Selected: ${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+        document.getElementById('map-coords').textContent = `
+        Selected: ${lat.toFixed(5)}, ${lng.toFixed(5)}
+        `;
+        
+        // Save the value of latitude and longitude to the hidden input
+        document.getElementById("lat_input").value = lat;
+        document.getElementById("lng_input").value = lng;
+          
       });
     } else if (pickerMap) {
       pickerMap.invalidateSize(); // fix tile rendering after show
@@ -292,16 +304,21 @@
   });
 
   /* ---- Form submit feedback ---- */
-  document.getElementById('checkin-form').addEventListener('submit', function (e) {
-    e.preventDefault();
-    if (!this.checkValidity()) {
-      this.classList.add('was-validated');
-      return;
-    }
-    // Simulate success
-    alert('Check-in published! (Demo — redirecting to home)');
-    window.location.href = 'index.html';
-  });
+  // document.getElementById('checkin-form').addEventListener('submit', function (e) {
+  //   e.preventDefault();
+  //   if (!this.checkValidity()) {
+  //     this.classList.add('was-validated');
+  //     return;
+  //   }
+  //   // Simulate success
+  //   alert('Check-in published! (Demo — redirecting to home)');
+  //   window.location.href = 'index.html';
+  // });
+
+  {% if login_status == False %}
+    const modal = new bootstrap.Modal(document.getElementById("login_modal"));
+    modal.show()
+  {% endif %}
 </script>
 
 </body>
