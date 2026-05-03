@@ -39,10 +39,12 @@ migrate.init_app(
 @app.route("/")
 @app.route("/index.html")
 def index():
-    """Render the home page prototype"""
-    new_check_ins = CheckIn.query.all()
-
-    return render_template("index.html", check_ins = new_check_ins)
+    import json
+    check_ins = CheckIn.query.all()
+    markers = json.dumps([
+        {"lat": c.lat, "lng": c.lng, "title": c.title, "category": c.category}
+        for c in check_ins if c.lat and c.lng])
+    return render_template("index.html", check_ins=check_ins, markers=markers)
 
 @app.route("/explore")
 def explore_alias():
