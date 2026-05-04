@@ -9,5 +9,10 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 markerData.forEach(function(m) {
   L.marker([m.lat, m.lng])
     .addTo(map)
-    .bindPopup("<strong>" + m.title + "</strong><br>" + m.category);
+    .bindPopup(
+      '<div class="perthpins-popup">' +
+        '<strong class="perthpins-popup-title">' + m.title + '</strong>' +
+        '<span class="perthpins-popup-category">' + m.category + '</span>' +
+      '</div>'
+    );
 });

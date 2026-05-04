@@ -18,18 +18,29 @@
 
 
 <!-- HERO MAP SECTION -->
-<div class="map_container">
-  <div id="map"></div>
-  <div class="position-absolute bottom-0 start-0 w-100 pb-3 map_overlay"
-       style="background: linear-gradient(transparent, rgba(0,0,0,0.55));">
-    <div class="container d-flex align-items-center gap-3">
-      <p class="text-white mb-0 fw-semibold fs-5">
-        Discover &amp; share hidden gems around Perth and UWA
-      </p>
-      <a id="share_post" href="{{ url_for('new_checkin') }}" class="btn btn-pp ms-auto">Share Your Discovery</a>
+<section class="hero-map-section">
+  <div class="container">
+    <div class="map_container">
+      <div id="map"></div>
+      <div class="map_overlay">
+        <div class="map-overlay-panel">
+          <span class="map-eyebrow">Live PerthPins map</span>
+          <div class="d-flex flex-column flex-md-row align-items-md-center gap-3">
+            <div class="me-md-auto">
+              <h1 class="map-heading">Discover Perth through local check-ins</h1>
+              <p class="map-subtitle mb-0">
+                Explore fresh finds around Perth and UWA, then pin your own favourite spot.
+              </p>
+            </div>
+            <a id="share_post" href="{{ url_for('new_checkin') }}" class="btn btn-pp map-cta">
+              Share Your Discovery
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
-</div>
+</section>
 
 
 <!-- LATEST CHECK-INS SECTION -->
