@@ -172,7 +172,7 @@
 <script>
   // jinja2 statements cannote be written in .js file, so it has to be written in .html file
   document.getElementById("share_post").addEventListener("click", (e) => {
-    {% if not session.get("user_id") %}
+    {% if not current_user.is_authenticated %}
       e.preventDefault()
       // display the notification
       const modal = new bootstrap.Modal(document.getElementById("login_modal"));
