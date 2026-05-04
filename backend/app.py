@@ -4,11 +4,13 @@ Application entry point.
 
 import os
 
-from flask import Flask, flash, redirect, render_template, request, session, url_for
+from flask import Flask, flash, redirect, render_template, request, url_for
+from flask_login import current_user, login_required, login_user, logout_user
+from flask_wtf.csrf import CSRFError
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from .config import Config
-from .extensions import db, migrate
+from .extensions import csrf, db, login_manager, migrate
 from . import models  # noqa: F401
 from .models import User, CheckIn
 
@@ -34,6 +36,27 @@ migrate.init_app(
     db,
     directory=os.path.join(app.root_path, "migrations")
 ) # Use backend/migrations as the migration directory
+login_manager.init_app(app)
+login_manager.login_view = "login"
+login_manager.login_message = "Please log in to access this page."
+login_manager.login_message_category = "warning"
+csrf.init_app(app)
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    """Load the current user for Flask-Login from the SQLAlchemy model."""
+    try:
+        return db.session.get(User, int(user_id))
+    except (TypeError, ValueError):
+        return None
+
+
+@app.errorhandler(CSRFError)
+def handle_csrf_error(error):
+    """Show a friendly message when a submitted form is missing/has bad CSRF."""
+    flash("Security check failed. Please refresh the page and try again.", "danger")
+    return redirect(request.referrer or url_for("index"))
 
 
 @app.route("/")
@@ -69,11 +92,9 @@ def new_checkin_alias():
     return redirect(url_for("new_checkin"))
 
 @app.route("/new-checkin.html", methods=["GET", "POST"])
+@login_required
 def new_checkin():
     if request.method == "POST":
-        if not session.get("user_id"):
-            return render_template(url_for("new_checkin"), login_status=False)
-        
         # get information from the front end by id
         title = request.form.get("title")
         category = request.form.get("category")
@@ -83,7 +104,7 @@ def new_checkin():
 
         # for all data into a dictionary
         form_data = {
-            "user_id": session["user_id"],
+            "user_id": current_user.id,
             "title": title,
             "description": description,
             "category": category,
@@ -144,6 +165,9 @@ def login_alias():
 @app.route("/login.html", methods=["GET", "POST"])
 def login():
     """Log in an existing user and store their identity in the session."""
+    if current_user.is_authenticated:
+        return redirect(url_for("index"))
+
     if request.method == "POST":
         identifier = request.form.get("identifier", "").strip()
         password = request.form.get("password", "")
@@ -161,9 +185,7 @@ def login():
             flash("Invalid username/email or password.", "danger")
             return render_template("login.html", form_data=form_data)
 
-        session.clear()
-        session["user_id"] = user.id
-        session["username"] = user.username
+        login_user(user)
 
         flash("Logged in successfully.", "success")
         return redirect(url_for("index"))
@@ -171,10 +193,11 @@ def login():
     return render_template("login.html", form_data={})
 
 
-@app.route("/logout")
+@app.route("/logout", methods=["POST"])
+@login_required
 def logout():
-    """Log out the current user by clearing the session."""
-    session.clear()
+    """Log out the current user with Flask-Login."""
+    logout_user()
     flash("You have been logged out.", "success")
     return redirect(url_for("index"))
 
@@ -197,6 +220,9 @@ def register_alias():
 @app.route("/register.html", methods=["GET", "POST"])
 def register():
     """Create a new user account from the registration form."""
+    if current_user.is_authenticated:
+        return redirect(url_for("index"))
+
     if request.method == "POST":
         username = request.form.get("username", "").strip()
         email = request.form.get("email", "").strip().lower()
