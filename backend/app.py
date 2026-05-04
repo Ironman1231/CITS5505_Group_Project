@@ -62,11 +62,11 @@ def handle_csrf_error(error):
 @app.route("/")
 @app.route("/index.html")
 def index():
-    import json
     check_ins = CheckIn.query.order_by(CheckIn.created_at.desc()).all()
-    markers = json.dumps([
+    markers = [
         {"lat": c.lat, "lng": c.lng, "title": c.title, "category": c.category}
-        for c in check_ins if c.lat and c.lng])
+        for c in check_ins if c.lat and c.lng
+    ]
     return render_template("index.html", check_ins=check_ins, markers=markers)
 
 @app.route("/explore")
