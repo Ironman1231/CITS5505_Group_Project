@@ -65,7 +65,7 @@ def index():
     check_ins = CheckIn.query.order_by(CheckIn.created_at.desc()).all()
     markers = [
         {"lat": c.lat, "lng": c.lng, "title": c.title, "category": c.category}
-        for c in check_ins if c.lat and c.lng
+        for c in check_ins if c.lat is not None and c.lng is not None
     ]
     return render_template("index.html", check_ins=check_ins, markers=markers)
 

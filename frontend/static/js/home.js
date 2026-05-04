@@ -1,4 +1,6 @@
-let map = L.map('map').setView([-31.9805, 115.8178], 14);
+let map = L.map('map', {
+  scrollWheelZoom: false
+}).setView([-31.9805, 115.8178], 14);
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '&copy; OpenStreetMap contributors'
