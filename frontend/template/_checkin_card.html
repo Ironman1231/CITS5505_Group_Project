@@ -1,0 +1,59 @@
+{% set category_labels = {
+  "food": "Food & Drink",
+  "study": "Study Spot",
+  "nature": "Nature",
+  "nightlife": "Nightlife",
+  "shopping": "Shopping",
+  "other": "Other"
+} %}
+{% set category = check_in.category or "other" %}
+{% set category_key = category if category in category_labels else "other" %}
+{% set description = check_in.description or "No description provided yet." %}
+{% set photo = check_in.photos.first() %}
+{% set author_name = check_in.author.username if check_in.author else "Unknown author" %}
+
+<div class="col-sm-6 col-lg-4 col-xl-3">
+  <div class="card checkin-card h-100">
+    <img
+      src="{{ photo.url if photo else 'https://picsum.photos/400/300?random=' ~ check_in.id }}"
+      class="card-img-top"
+      alt="{{ check_in.title }}"
+    />
+    <div class="card-body">
+      <span class="cat-label cat-{{ category_key }} mb-1">
+        {{ category_labels.get(category_key, category | title) }}
+      </span>
+      <h5 class="card-title">{{ check_in.title }}</h5>
+      <div class="mb-1">
+        {% if check_in.rating is not none %}
+          <span class="rating-num">{{ "%.1f" | format(check_in.rating) }}</span>
+        {% else %}
+          <span class="text-muted small">Not rated yet</span>
+        {% endif %}
+      </div>
+      <p class="card-text">
+        {% if description | length <= 80 %}
+          {{ description }}
+        {% else %}
+          {{ description[:80] }}...
+        {% endif %}
+      </p>
+      <div class="checkin-card-meta d-flex align-items-center justify-content-between mt-3">
+        <div class="author-chip" aria-label="Check-in author {{ author_name }}">
+          <span class="author-avatar">{{ author_name[:1] | upper }}</span>
+          <span class="author-name">
+            <span class="author-prefix">by</span> {{ author_name }}
+          </span>
+        </div>
+        <button class="btn btn-sm btn-outline-secondary btn-fav" aria-label="Add to favourites">
+          Favourite
+        </button>
+      </div>
+    </div>
+    <div class="card-footer bg-transparent border-0 pt-0">
+      <a href="/checkins/{{ check_in.id }}" class="btn btn-sm btn-outline-secondary w-100">
+        View Details
+      </a>
+    </div>
+  </div>
+</div>
