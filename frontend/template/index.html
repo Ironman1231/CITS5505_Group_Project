@@ -39,119 +39,22 @@
 
   <div class="row g-4">
 
-    {% for check_in in check_ins %}
-
-      <div class="col-sm-6 col-lg-4 col-xl-3">
-        <div class="card checkin-card h-100">
-          <img src="https://picsum.photos/400/300?random=11" class="card-img-top" alt="Matilda Bay" />
-          <div class="card-body">
-            <span class="cat-label cat-nature mb-1">{{ check_in.category }}</span>
-            <h5 class="card-title">{{ check_in.title }}</h5>
-            <div class="mb-1"><span class="rating-num">4.5</span></div>
-            <p class="card-text">
-              {% if check_in.description | length <= 50 %}
-                {{ check_in.description }}
-              {% else %}
-                {{ check_in.description[:50] + "..." }}
-              {% endif %}
-            </p>
-            <div class="d-flex align-items-center justify-content-between mt-2">
-              <small class="text-muted">{{ check_in.user_id }}</small>
-              <button class="btn btn-sm btn-outline-secondary btn-fav" aria-label="Add to favourites">Favourite</button>
-            </div>
-          </div>
-          <div class="card-footer bg-transparent border-0 pt-0">
-            <a href="checkin_details.html" class="btn btn-sm btn-outline-secondary w-100">View Details</a>
+      {% for check_in in check_ins %}
+        {% include "_checkin_card.html" %}
+      {% else %}
+        <div class="col-12">
+          <div class="bg-white border rounded-3 shadow-sm text-center p-5">
+            <h3 class="h5 fw-bold text-green mb-2">No check-ins yet</h3>
+            <p class="text-muted mb-3">Be the first to share a hidden gem around Perth or UWA.</p>
+            <a href="{{ url_for('new_checkin') }}" class="btn btn-pp">Share Your Discovery</a>
           </div>
         </div>
-      </div>
-
-    {% endfor %}
-
-    <!-- CARD 1 — Matilda Bay -->
-    <!-- <div class="col-sm-6 col-lg-4 col-xl-3">
-      <div class="card checkin-card h-100">
-        <img src="https://picsum.photos/400/300?random=11" class="card-img-top" alt="Matilda Bay" />
-        <div class="card-body">
-          <span class="cat-label cat-nature mb-1">Nature</span>
-          <h5 class="card-title">Matilda Bay</h5>
-          <div class="mb-1"><span class="rating-num">4.5</span></div>
-          <p class="card-text">Sunset views just beside UWA campus are absolutely stunning...</p>
-          <div class="d-flex align-items-center justify-content-between mt-2">
-            <small class="text-muted">perthwanderer</small>
-            <button class="btn btn-sm btn-outline-secondary btn-fav" aria-label="Add to favourites">Favourite</button>
-          </div>
-        </div>
-        <div class="card-footer bg-transparent border-0 pt-0">
-          <a href="checkin_details.html" class="btn btn-sm btn-outline-secondary w-100">View Details</a>
-        </div>
-      </div>
-    </div> -->
-
-    <!-- CARD 2 — Kings Park Botanic Garden -->
-    <!-- <div class="col-sm-6 col-lg-4 col-xl-3">
-      <div class="card checkin-card h-100">
-        <img src="https://picsum.photos/400/300?random=12" class="card-img-top" alt="Kings Park" />
-        <div class="card-body">
-          <span class="cat-label cat-nature mb-1">Nature</span>
-          <h5 class="card-title">Kings Park Botanic Garden</h5>
-          <div class="mb-1"><span class="rating-num">4.8</span></div>
-          <p class="card-text">Wildflower season is breathtaking — absolutely worth the visit!</p>
-          <div class="d-flex align-items-center justify-content-between mt-2">
-            <small class="text-muted">sunset_chaser</small>
-            <button class="btn btn-sm btn-outline-secondary btn-fav" aria-label="Add to favourites">Favourite</button>
-          </div>
-        </div>
-        <div class="card-footer bg-transparent border-0 pt-0">
-          <a href="#" class="btn btn-sm btn-outline-secondary w-100">View Details</a>
-        </div>
-      </div>
-    </div> -->
-
-    <!-- CARD 3 — Chicho Gelato -->
-    <!-- <div class="col-sm-6 col-lg-4 col-xl-3">
-      <div class="card checkin-card h-100">
-        <img src="https://picsum.photos/400/300?random=13" class="card-img-top" alt="Chicho Gelato" />
-        <div class="card-body">
-          <span class="cat-label cat-food mb-1">Food &amp; Drink</span>
-          <h5 class="card-title">Chicho Gelato</h5>
-          <div class="mb-1"><span class="rating-num">4.6</span></div>
-          <p class="card-text">Best gelato in Perth — always a queue but absolutely worth the wait...</p>
-          <div class="d-flex align-items-center justify-content-between mt-2">
-            <small class="text-muted">uwa_foodie</small>
-            <button class="btn btn-sm btn-outline-secondary btn-fav" aria-label="Add to favourites">Favourite</button>
-          </div>
-        </div>
-        <div class="card-footer bg-transparent border-0 pt-0">
-          <a href="#" class="btn btn-sm btn-outline-secondary w-100">View Details</a>
-        </div>
-      </div>
-    </div> -->
-
-    <!-- CARD 4 — Reid Library -->
-    <!-- <div class="col-sm-6 col-lg-4 col-xl-3">
-      <div class="card checkin-card h-100">
-        <img src="https://picsum.photos/400/300?random=14" class="card-img-top" alt="Reid Library" />
-        <div class="card-body">
-          <span class="cat-label cat-study mb-1">Study Spot</span>
-          <h5 class="card-title">Reid Library</h5>
-          <div class="mb-1"><span class="rating-num">4.2</span></div>
-          <p class="card-text">Best study spot on campus — especially level 4 with the views...</p>
-          <div class="d-flex align-items-center justify-content-between mt-2">
-            <small class="text-muted">studyspot_hunter</small>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-        </div>
-        <div class="card-footer bg-transparent border-0 pt-0">
-          <a href="#" class="btn btn-sm btn-outline-secondary w-100">View Details</a>
-        </div>
-      </div>
-    </div> -->
+      {% endfor %}
 
   </div><!-- /row -->
 
   <div class="text-center mt-4">
-    <a href="explore.html" class="btn btn-outline-secondary px-4">View All Check-ins</a>
+    <a href="{{ url_for('explore') }}" class="btn btn-outline-secondary px-4">View All Check-ins</a>
   </div>
 
   {% include "login_popup.html" %}
