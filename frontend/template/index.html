@@ -18,18 +18,29 @@
 
 
 <!-- HERO MAP SECTION -->
-<div class="map_container">
-  <div id="map"></div>
-  <div class="position-absolute bottom-0 start-0 w-100 pb-3 map_overlay"
-       style="background: linear-gradient(transparent, rgba(0,0,0,0.55));">
-    <div class="container d-flex align-items-center gap-3">
-      <p class="text-white mb-0 fw-semibold fs-5">
-        Discover &amp; share hidden gems around Perth and UWA
-      </p>
-      <a id="share_post" href="new-checkin.html" class="btn btn-pp ms-auto">Share Your Discovery</a>
+<section class="hero-map-section">
+  <div class="container">
+    <div class="map_container">
+      <div id="map"></div>
+      <div class="map_overlay">
+        <div class="map-overlay-panel">
+          <span class="map-eyebrow">Live PerthPins map</span>
+          <div class="d-flex flex-column flex-md-row align-items-md-center gap-3">
+            <div class="me-md-auto">
+              <h1 class="map-heading">Discover Perth through local check-ins</h1>
+              <p class="map-subtitle mb-0">
+                Explore fresh finds around Perth and UWA, then pin your own favourite spot.
+              </p>
+            </div>
+            <a id="share_post" href="{{ url_for('new_checkin') }}" class="btn btn-pp map-cta">
+              Share Your Discovery
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
-</div>
+</section>
 
 
 <!-- LATEST CHECK-INS SECTION -->
@@ -39,119 +50,22 @@
 
   <div class="row g-4">
 
-    {% for check_in in check_ins %}
-
-      <div class="col-sm-6 col-lg-4 col-xl-3">
-        <div class="card checkin-card h-100">
-          <img src="https://picsum.photos/400/300?random=11" class="card-img-top" alt="Matilda Bay" />
-          <div class="card-body">
-            <span class="cat-label cat-nature mb-1">{{ check_in.category }}</span>
-            <h5 class="card-title">{{ check_in.title }}</h5>
-            <div class="mb-1"><span class="rating-num">4.5</span></div>
-            <p class="card-text">
-              {% if check_in.description | length <= 50 %}
-                {{ check_in.description }}
-              {% else %}
-                {{ check_in.description[:50] + "..." }}
-              {% endif %}
-            </p>
-            <div class="d-flex align-items-center justify-content-between mt-2">
-              <small class="text-muted">{{ check_in.user_id }}</small>
-              <button class="btn btn-sm btn-outline-secondary btn-fav" aria-label="Add to favourites">Favourite</button>
-            </div>
-          </div>
-          <div class="card-footer bg-transparent border-0 pt-0">
-            <a href="checkin_details.html" class="btn btn-sm btn-outline-secondary w-100">View Details</a>
+      {% for check_in in check_ins %}
+        {% include "_checkin_card.html" %}
+      {% else %}
+        <div class="col-12">
+          <div class="bg-white border rounded-3 shadow-sm text-center p-5">
+            <h3 class="h5 fw-bold text-green mb-2">No check-ins yet</h3>
+            <p class="text-muted mb-3">Be the first to share a hidden gem around Perth or UWA.</p>
+            <a href="{{ url_for('new_checkin') }}" class="btn btn-pp">Share Your Discovery</a>
           </div>
         </div>
-      </div>
-
-    {% endfor %}
-
-    <!-- CARD 1 — Matilda Bay -->
-    <!-- <div class="col-sm-6 col-lg-4 col-xl-3">
-      <div class="card checkin-card h-100">
-        <img src="https://picsum.photos/400/300?random=11" class="card-img-top" alt="Matilda Bay" />
-        <div class="card-body">
-          <span class="cat-label cat-nature mb-1">Nature</span>
-          <h5 class="card-title">Matilda Bay</h5>
-          <div class="mb-1"><span class="rating-num">4.5</span></div>
-          <p class="card-text">Sunset views just beside UWA campus are absolutely stunning...</p>
-          <div class="d-flex align-items-center justify-content-between mt-2">
-            <small class="text-muted">perthwanderer</small>
-            <button class="btn btn-sm btn-outline-secondary btn-fav" aria-label="Add to favourites">Favourite</button>
-          </div>
-        </div>
-        <div class="card-footer bg-transparent border-0 pt-0">
-          <a href="checkin_details.html" class="btn btn-sm btn-outline-secondary w-100">View Details</a>
-        </div>
-      </div>
-    </div> -->
-
-    <!-- CARD 2 — Kings Park Botanic Garden -->
-    <!-- <div class="col-sm-6 col-lg-4 col-xl-3">
-      <div class="card checkin-card h-100">
-        <img src="https://picsum.photos/400/300?random=12" class="card-img-top" alt="Kings Park" />
-        <div class="card-body">
-          <span class="cat-label cat-nature mb-1">Nature</span>
-          <h5 class="card-title">Kings Park Botanic Garden</h5>
-          <div class="mb-1"><span class="rating-num">4.8</span></div>
-          <p class="card-text">Wildflower season is breathtaking — absolutely worth the visit!</p>
-          <div class="d-flex align-items-center justify-content-between mt-2">
-            <small class="text-muted">sunset_chaser</small>
-            <button class="btn btn-sm btn-outline-secondary btn-fav" aria-label="Add to favourites">Favourite</button>
-          </div>
-        </div>
-        <div class="card-footer bg-transparent border-0 pt-0">
-          <a href="#" class="btn btn-sm btn-outline-secondary w-100">View Details</a>
-        </div>
-      </div>
-    </div> -->
-
-    <!-- CARD 3 — Chicho Gelato -->
-    <!-- <div class="col-sm-6 col-lg-4 col-xl-3">
-      <div class="card checkin-card h-100">
-        <img src="https://picsum.photos/400/300?random=13" class="card-img-top" alt="Chicho Gelato" />
-        <div class="card-body">
-          <span class="cat-label cat-food mb-1">Food &amp; Drink</span>
-          <h5 class="card-title">Chicho Gelato</h5>
-          <div class="mb-1"><span class="rating-num">4.6</span></div>
-          <p class="card-text">Best gelato in Perth — always a queue but absolutely worth the wait...</p>
-          <div class="d-flex align-items-center justify-content-between mt-2">
-            <small class="text-muted">uwa_foodie</small>
-            <button class="btn btn-sm btn-outline-secondary btn-fav" aria-label="Add to favourites">Favourite</button>
-          </div>
-        </div>
-        <div class="card-footer bg-transparent border-0 pt-0">
-          <a href="#" class="btn btn-sm btn-outline-secondary w-100">View Details</a>
-        </div>
-      </div>
-    </div> -->
-
-    <!-- CARD 4 — Reid Library -->
-    <!-- <div class="col-sm-6 col-lg-4 col-xl-3">
-      <div class="card checkin-card h-100">
-        <img src="https://picsum.photos/400/300?random=14" class="card-img-top" alt="Reid Library" />
-        <div class="card-body">
-          <span class="cat-label cat-study mb-1">Study Spot</span>
-          <h5 class="card-title">Reid Library</h5>
-          <div class="mb-1"><span class="rating-num">4.2</span></div>
-          <p class="card-text">Best study spot on campus — especially level 4 with the views...</p>
-          <div class="d-flex align-items-center justify-content-between mt-2">
-            <small class="text-muted">studyspot_hunter</small>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-        </div>
-        <div class="card-footer bg-transparent border-0 pt-0">
-          <a href="#" class="btn btn-sm btn-outline-secondary w-100">View Details</a>
-        </div>
-      </div>
-    </div> -->
+      {% endfor %}
 
   </div><!-- /row -->
 
   <div class="text-center mt-4">
-    <a href="explore.html" class="btn btn-outline-secondary px-4">View All Check-ins</a>
+    <a href="{{ url_for('explore') }}" class="btn btn-outline-secondary px-4">View All Check-ins</a>
   </div>
 
   {% include "login_popup.html" %}
@@ -160,12 +74,10 @@
 
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<!-- <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script> -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
     crossorigin=""></script>
 <script>const markerData = {{ markers | tojson }};</script>
-<script src="../static/js/home.js"></script>
 <script src="../static/js/home.js"></script>
 <script src="../static/js/common.js"></script>
 

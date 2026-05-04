@@ -1,5 +1,9 @@
 /* Home page styles */
 
+.hero-map-section {
+  padding: 1.25rem 0 0;
+}
+
 .section-title {
   font-size: 1.3rem;
   font-weight: 700;
@@ -8,18 +12,118 @@
 }
 
 #map {
-  height: 520px;
-}
-
-@media (max-width: 768px) {
-  /* rules in here only apply when screen width ≤ 768px */
-  #map { height: 320px; }
+  height: 460px;
+  border-radius: 1.35rem;
+  overflow: hidden;
 }
 
 .map_container {
   position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(45, 106, 79, 0.14);
+  border-radius: 1.5rem;
+  background:
+    linear-gradient(135deg, rgba(45, 106, 79, 0.08), rgba(255, 255, 255, 0.85)),
+    #fff;
+  box-shadow: 0 1.25rem 3.5rem rgba(37, 65, 50, 0.18);
 }
 
 .map_overlay {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: 3.2rem 0.85rem 0.65rem;
   z-index: 1000;
+  pointer-events: none;
+  background: linear-gradient(transparent, rgba(13, 33, 24, 0.72));
+}
+
+.map-overlay-panel {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 0.55rem 0.72rem;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 0.95rem;
+  color: #fff;
+  pointer-events: auto;
+  background: linear-gradient(135deg, rgba(17, 48, 34, 0.82), rgba(17, 48, 34, 0.52));
+  box-shadow: 0 0.9rem 2rem rgba(0, 0, 0, 0.22);
+  backdrop-filter: blur(12px);
+}
+
+.map-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 0.12rem;
+  color: #c7f2d8;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.map-heading {
+  margin: 0;
+  font-size: clamp(0.98rem, 2vw, 1.35rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.map-subtitle {
+  max-width: 620px;
+  margin-top: 0.15rem;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 0.78rem;
+  line-height: 1.35;
+}
+
+.map-cta {
+  flex: 0 0 auto;
+  padding: 0.38rem 0.72rem;
+  font-size: 0.88rem;
+  box-shadow: 0 0.65rem 1.4rem rgba(0, 0, 0, 0.2);
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 0.9rem;
+  box-shadow: 0 0.9rem 1.8rem rgba(29, 48, 38, 0.18);
+}
+
+.perthpins-popup {
+  min-width: 150px;
+}
+
+.perthpins-popup-title {
+  display: block;
+  margin-bottom: 0.2rem;
+  color: #244f3a;
+  font-weight: 800;
+}
+
+.perthpins-popup-category {
+  color: #6c757d;
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+@media (max-width: 768px) {
+  /* rules in here only apply when screen width ≤ 768px */
+  #map {
+    height: 360px;
+    border-radius: 1rem;
+  }
+
+  .hero-map-section {
+    padding-top: 0.75rem;
+  }
+
+  .map_overlay {
+    padding: 2.75rem 0.55rem 0.55rem;
+  }
+
+  .map-overlay-panel {
+    padding: 0.55rem;
+  }
 }
