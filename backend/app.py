@@ -15,6 +15,20 @@ from . import models  # noqa: F401
 from .models import User, CheckIn
 
 
+EXPLORE_CATEGORIES = {
+    "food": "Food & Drink",
+    "study": "Study Spot",
+    "nature": "Nature",
+    "nightlife": "Nightlife",
+    "shopping": "Shopping",
+    "other": "Other",
+}
+EXPLORE_SORT_OPTIONS = {
+    "newest": "Newest First",
+    "rating": "Highest Rated",
+}
+
+
 # Configure Flask to reuse the existing prototype templates and static files
 app = Flask(
     __name__,
@@ -74,9 +88,47 @@ def explore_alias():
     return redirect(url_for("explore"))
 @app.route("/explore.html")
 def explore():
-    """Render the explore page prototype"""
-    check_ins = CheckIn.query.order_by(CheckIn.created_at.desc()).all()
-    return render_template("explore.html", check_ins=check_ins)
+    """Render the explore page with database-backed filters and sorting."""
+    selected_category = request.args.get("category", "").strip()
+    selected_min_rating = request.args.get("min_rating", "").strip()
+    selected_sort = request.args.get("sort", "newest").strip() or "newest"
+
+    if selected_category not in EXPLORE_CATEGORIES:
+        selected_category = ""
+    if selected_sort not in EXPLORE_SORT_OPTIONS:
+        selected_sort = "newest"
+
+    min_rating_value = None
+    if selected_min_rating:
+        try:
+            min_rating_value = float(selected_min_rating)
+        except ValueError:
+            selected_min_rating = ""
+
+    query = CheckIn.query
+    if selected_category:
+        query = query.filter(CheckIn.category == selected_category)
+    if min_rating_value is not None:
+        query = query.filter(CheckIn.rating >= min_rating_value)
+
+    if selected_sort == "rating":
+        query = query.order_by(CheckIn.rating.desc(), CheckIn.created_at.desc())
+    else:
+        query = query.order_by(CheckIn.created_at.desc())
+
+    check_ins = query.all()
+    filters = {
+        "category": selected_category,
+        "min_rating": selected_min_rating,
+        "sort": selected_sort,
+    }
+    return render_template(
+        "explore.html",
+        check_ins=check_ins,
+        filters=filters,
+        category_options=EXPLORE_CATEGORIES,
+        sort_options=EXPLORE_SORT_OPTIONS,
+    )
 
 
 @app.route("/checkin-details")
@@ -264,7 +316,14 @@ def register():
 def search():
     query = request.args.get("q", "").strip()
     check_ins = CheckIn.query.order_by(CheckIn.created_at.desc()).all()
-    return render_template("explore.html", check_ins=check_ins, search_query=query)
+    return render_template(
+        "explore.html",
+        check_ins=check_ins,
+        search_query=query,
+        filters={"category": "", "min_rating": "", "sort": "newest"},
+        category_options=EXPLORE_CATEGORIES,
+        sort_options=EXPLORE_SORT_OPTIONS,
+    )
 @app.route("/navbar.html")
 def navbar():
     """Render the navigation bar prototype"""
