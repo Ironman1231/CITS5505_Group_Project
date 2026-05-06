@@ -40,6 +40,7 @@ migrate.init_app(
 @app.route("/index.html")
 def index():
     """Render the home page prototype"""
+    # get all data from the check_in table of data base, just like SELECT * FROM check_in
     new_check_ins = CheckIn.query.all()
 
     return render_template("index.html", check_ins = new_check_ins)

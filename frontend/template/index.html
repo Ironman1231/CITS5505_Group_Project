@@ -177,6 +177,15 @@
       modal.show()
     {% endif %}
   })
+
+  document.getElementById("new_checkin").addEventListener("click", (e) => {
+    {% if not session.get("user_id") %}
+      e.preventDefault()
+      // display the notification
+      const modal = new bootstrap.Modal(document.getElementById("login_modal"));
+      modal.show()
+    {% endif %}
+  })
 </script>
 
 </body>
