@@ -28,7 +28,14 @@
         </li>
       </ul>
       <form class="d-flex me-3" role="search" action="{{ url_for('search') }}" method="GET">
-        <input type="search" name="q" class="form-control form-control-sm" placeholder="Search places..." style="width:180px;" />
+        <input
+          type="search"
+          name="q"
+          class="form-control form-control-sm"
+          value="{{ search_query | default(request.args.get('q', '')) }}"
+          placeholder="Search places..."
+          style="width:180px;"
+        />
         <button class="btn btn-outline-secondary btn-sm ms-1" type="submit">Search</button>
       </form>
       <div class="d-flex gap-2">
