@@ -12,7 +12,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from .config import Config
 from .extensions import csrf, db, login_manager, migrate
 from . import models  # noqa: F401
-from .models import User, CheckIn
+from .models import CheckIn, Photo, User
 
 
 EXPLORE_CATEGORIES = {
@@ -141,8 +141,37 @@ def checkin_details_alias():
     return redirect(url_for("checkin_details"))
 @app.route("/checkin_details.html")
 def checkin_details():
-    """Render the check-in details page prototype"""
-    return render_template("checkin_details.html")
+    """Redirect the old prototype URL to the latest available detail page."""
+    check_in = CheckIn.query.order_by(CheckIn.created_at.desc()).first()
+    if not check_in:
+        return redirect(url_for("explore"))
+    return redirect(url_for("checkin_detail", checkin_id=check_in.id))
+
+
+@app.route("/checkins/<int:checkin_id>")
+def checkin_detail(checkin_id):
+    """Render one selected check-in from the database."""
+    check_in = db.get_or_404(CheckIn, checkin_id)
+    photos = check_in.photos.order_by(Photo.display_order.asc(), Photo.id.asc()).all()
+    comments_count = check_in.comments.count()
+    favourites_count = check_in.favourites.count()
+    category = check_in.category if check_in.category in EXPLORE_CATEGORIES else "other"
+    detail_map = {
+        "lat": check_in.lat,
+        "lng": check_in.lng,
+        "title": check_in.title,
+        "category": EXPLORE_CATEGORIES.get(category, category.title()),
+    }
+    return render_template(
+        "checkin_details.html",
+        check_in=check_in,
+        photos=photos,
+        comments_count=comments_count,
+        favourites_count=favourites_count,
+        category_key=category,
+        category_label=EXPLORE_CATEGORIES.get(category, category.title()),
+        detail_map=detail_map,
+    )
 
 
 @app.route("/new-checkin")
