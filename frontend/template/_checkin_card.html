@@ -51,7 +51,7 @@
       </div>
     </div>
     <div class="card-footer bg-transparent border-0 pt-0">
-      <a href="/checkins/{{ check_in.id }}" class="btn btn-sm btn-outline-secondary w-100">
+      <a href="{{ url_for('checkin_detail', checkin_id=check_in.id) }}" class="btn btn-sm btn-outline-secondary w-100">
         View Details
       </a>
     </div>
