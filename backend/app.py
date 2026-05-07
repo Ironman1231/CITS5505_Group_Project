@@ -29,6 +29,11 @@ EXPLORE_SORT_OPTIONS = {
 }
 
 
+def escape_like_search(value):
+    """Escape SQL LIKE wildcard characters before building a search pattern."""
+    return value.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+
+
 # Configure Flask to reuse the existing prototype templates and static files
 app = Flask(
     __name__,
@@ -315,7 +320,14 @@ def register():
 @app.route("/search")
 def search():
     query = request.args.get("q", "").strip()
-    check_ins = CheckIn.query.order_by(CheckIn.created_at.desc()).all()
+    if not query:
+        return redirect(url_for("explore"))
+
+    search_pattern = f"%{escape_like_search(query)}%"
+    check_ins = CheckIn.query.filter(
+        (CheckIn.title.ilike(search_pattern, escape="\\")) |
+        (CheckIn.description.ilike(search_pattern, escape="\\"))
+    ).order_by(CheckIn.created_at.desc()).all()
     return render_template(
         "explore.html",
         check_ins=check_ins,
