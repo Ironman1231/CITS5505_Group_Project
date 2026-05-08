@@ -33,6 +33,7 @@ EXPLORE_SORT_OPTIONS = {
     "newest": "Newest First",
     "rating": "Highest Rated",
 }
+CATETORIES = ["food", "study", "nature", "nightlife", "shopping", "other"]
 
 
 def escape_like_search(value):
@@ -274,11 +275,39 @@ def new_checkin():
     if request.method == "POST":
         # get information from the front end by id
         title = request.form.get("title")
+        if not title:
+            flash('Title is required')
+            print('Title is required')
+            return redirect(url_for('new_checkin'))
+        
         category = request.form.get("category")
+        if category not in CATETORIES:
+            flash("Category is wrong")
+            print("Category is wrong")
+            return redirect(url_for('new_checkin'))
+
         description = request.form.get("description")
-        rating = request.form.get("rating")
-        lat = float(request.form.get("lat"))
-        lng = float(request.form.get("lng"))
+        if not description:
+            flash('Description is required')
+            print('Description is required')
+            return redirect(url_for('new_checkin'))
+        
+        try:
+            rating = float(request.form.get("rating"))
+        except:
+            flash('Invalid rating')
+            print('Invalid rating')
+            return redirect(url_for('new_checkin'))
+        
+        try:
+            lat = float(request.form.get("lat"))
+            lng = float(request.form.get("lng"))
+        except:
+            flash('Invalid location')
+            print('Invalid location')
+            return redirect(url_for('new_checkin'))
+
+
 
         # for all data into a dictionary
         form_data = {
