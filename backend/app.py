@@ -66,13 +66,31 @@ def explore():
     return render_template("explore.html")
 
 
-@app.route("/checkin-details")
-def checkin_details_alias():
-    return redirect(url_for("checkin_details"))
-@app.route("/checkin_details.html")
-def checkin_details():
-    """Render the check-in details page prototype"""
-    return render_template("checkin_details.html")
+@app.route("/checkin/<int:checkin_id>")
+def checkin_details(checkin_id):
+    """Render the check-in detail page with live data."""
+    checkin = db.session.get(models.CheckIn, checkin_id)
+    if checkin is None:
+        flash("Check-in not found.", "danger")
+        return redirect(url_for("explore"))
+    photos         = checkin.photos.order_by(models.Photo.display_order).all()
+    comments       = checkin.comments.order_by(models.Comment.created_at.asc()).all()
+    fav_count      = checkin.favourites.count()
+    category_key   = checkin.category or "other"
+    category_label = CATEGORY_LABELS.get(category_key, "Other")
+    is_favourited  = False
+    if current_user.is_authenticated:
+        is_favourited = models.Favourite.query.filter_by(
+            user_id=current_user.id, checkin_id=checkin_id
+        ).first() is not None
+    detail_map = {"lat": checkin.lat, "lng": checkin.lng, "title": checkin.title}
+    return render_template(
+        "checkin_details.html",
+        check_in=checkin, photos=photos, comments=comments,
+        comments_count=len(comments), favourites_count=fav_count,
+        category_key=category_key, category_label=category_label,
+        is_favourited=is_favourited, detail_map=detail_map,
+    )
 
 
 @app.route("/new-checkin")
