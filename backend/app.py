@@ -12,7 +12,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from .config import Config
 from .extensions import csrf, db, login_manager, migrate
 from . import models  # noqa: F401
-from .models import CheckIn, Photo, User
+from .models import CheckIn, Comment, Photo, User
 
 
 EXPLORE_CATEGORIES = {
@@ -153,7 +153,8 @@ def checkin_detail(checkin_id):
     """Render one selected check-in from the database."""
     check_in = db.get_or_404(CheckIn, checkin_id)
     photos = check_in.photos.order_by(Photo.display_order.asc(), Photo.id.asc()).all()
-    comments_count = check_in.comments.count()
+    comments = check_in.comments.order_by(Comment.created_at.desc()).all()
+    comments_count = len(comments)
     favourites_count = check_in.favourites.count()
     category = check_in.category if check_in.category in EXPLORE_CATEGORIES else "other"
     detail_map = {
@@ -166,12 +167,39 @@ def checkin_detail(checkin_id):
         "checkin_details.html",
         check_in=check_in,
         photos=photos,
+        comments=comments,
         comments_count=comments_count,
         favourites_count=favourites_count,
         category_key=category,
         category_label=EXPLORE_CATEGORIES.get(category, category.title()),
         detail_map=detail_map,
     )
+
+
+@app.route("/checkins/<int:checkin_id>/comments", methods=["POST"])
+@login_required
+def add_comment(checkin_id):
+    """Save a logged-in user's comment for one check-in."""
+    check_in = db.get_or_404(CheckIn, checkin_id)
+    body = request.form.get("body", "").strip()
+
+    if not body:
+        flash("Please write a comment before posting.", "danger")
+        return redirect(url_for("checkin_detail", checkin_id=check_in.id))
+    if len(body) > 1000:
+        flash("Comments must be 1000 characters or fewer.", "danger")
+        return redirect(url_for("checkin_detail", checkin_id=check_in.id))
+
+    comment = Comment(
+        user_id=current_user.id,
+        checkin_id=check_in.id,
+        body=body,
+    )
+    db.session.add(comment)
+    db.session.commit()
+
+    flash("Comment posted successfully.", "success")
+    return redirect(url_for("checkin_detail", checkin_id=check_in.id))
 
 
 @app.route("/new-checkin")
