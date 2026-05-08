@@ -81,7 +81,7 @@ def upload_image(file, filename):
     """Upload an image to R2 and return the public URL"""
     bucket = os.getenv("CLOUDFLARE_BUCKET_NAME")
 
-    s3.upload_fileob(
+    s3.upload_fileobj(
         file,
         bucket,
         filename,
@@ -91,6 +91,17 @@ def upload_image(file, filename):
     # return the public URL
     public_url = os.getenv("CLOUDFLARE_PUBLIC_URL")
     return f"{public_url}/{filename}"
+
+# test: upload a test file
+try:
+    s3.put_object(
+        Bucket=os.getenv('CLOUDFLARE_BUCKET_NAME'),
+        Key='test.txt',
+        Body=b'hello world'
+    )
+    print("Upload successful!")
+except Exception as e:
+    print("Upload failed:", e)
 
 
 @login_manager.user_loader
@@ -269,12 +280,13 @@ def new_checkin():
         lng = float(request.form.get("lng"))
 
         # image test
-        image = request.files.get("photo-input")
+        image = request.files.get("input_image")
         if image:
             # generate unqiue filename to avoid conflicts
             ext = image.filename.rsplit('.', 1)[1].lower()
             filename = f"{uuid.uuid4()}.{ext}"
             image_url = upload_image(image, filename)
+            print("Uploaded:", image_url)  # debug
 
         # for all data into a dictionary
         form_data = {

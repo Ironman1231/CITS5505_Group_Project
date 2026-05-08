@@ -36,7 +36,8 @@
     <!-- ===== FORM COLUMN ===== -->
     <div class="col-lg-7">
       <div class="bg-white rounded-3 shadow-sm p-4">
-        <form id="checkin-form" method="POST">
+        <!-- enctype="multipart/form-data" is needed. Without enctype="multipart/form-data", Flask will receive an empty request.files and the image won't be uploaded. -->
+        <form id="checkin-form" method="POST" enctype="multipart/form-data">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
           <!-- Hidden rating input -->
           <input type="hidden" name="rating" id="rating-value" value="0" />
@@ -80,7 +81,7 @@
               <div class="mt-2 text-muted">Click to upload photos</div>
               <div class="text-muted small">PNG, JPG up to 5 MB each</div>
             </label>
-            <input type="file" class="d-none" id="photo-input" multiple accept="image/*" />
+            <input type="file" class="d-none" id="photo-input" name="input_image" multiple accept="image/*" />
             <div id="photo-previews" class="mt-2 d-flex flex-wrap"></div>
           </div>
 
