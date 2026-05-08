@@ -276,6 +276,7 @@ def new_checkin():
         title = request.form.get("title")
         category = request.form.get("category")
         description = request.form.get("description")
+        rating = request.form.get("rating")
         lat = float(request.form.get("lat"))
         lng = float(request.form.get("lng"))
 
@@ -285,6 +286,7 @@ def new_checkin():
             "title": title,
             "description": description,
             "category": category,
+            "rating": rating,
             "lat": lat,
             "lng": lng
         }
@@ -299,6 +301,7 @@ def new_checkin():
             title = form_data["title"],
             description = form_data["description"],
             category = form_data["category"],
+            rating = form_data["rating"],
             lat = form_data["lat"],
             lng = form_data["lng"]
         )

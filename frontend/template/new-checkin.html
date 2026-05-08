@@ -39,8 +39,6 @@
         <!-- enctype="multipart/form-data" is needed. Without enctype="multipart/form-data", Flask will receive an empty request.files and the image won't be uploaded. -->
         <form id="checkin-form" method="POST" enctype="multipart/form-data">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-          <!-- Hidden rating input -->
-          <input type="hidden" name="rating" id="rating-value" value="0" />
 
           <!-- 1. Place name / location -->
           <div class="mb-4">
@@ -81,7 +79,7 @@
               <div class="mt-2 text-muted">Click to upload photos</div>
               <div class="text-muted small">PNG, JPG up to 5 MB each</div>
             </label>
-            <input type="file" class="d-none" id="photo-input" name="input_image" multiple accept="image/*" />
+            <input type="file" class="d-none" id="photo-input" name="input_image" multiple accept="image/*"/>
             <div id="photo-previews" class="mt-2 d-flex flex-wrap"></div>
           </div>
 
@@ -124,6 +122,8 @@
             </div>
             <div class="form-text">Click a star to rate (1 = poor, 5 = excellent)</div>
           </div>
+          <!-- Hidden rating input -->
+          <input type="hidden" name="rating" id="rating-value" value="0" />
 
           <!-- 6. Description -->
           <div class="mb-4">
@@ -327,14 +327,22 @@
         }
     });
 
-    console.log('reached map check');
-    console.log('lat:', document.getElementById('lat_input').value);
-    console.log('lng:', document.getElementById('lng_input').value);
-
     const lat = document.getElementById('lat_input').value;
     const lng = document.getElementById('lng_input').value;
     if (lat == '' || lng == '') {
       alert('Please select a location on the map');
+      return;
+    }
+
+    const photo = document.getElementById("photo-input");
+    if (!photo.files || photo.files.length === 0) {
+      alert("Please upload a photo");
+      return;
+    }
+
+    const rate = document.getElementById("rating-value").value;
+    if (rate === "0") {
+      alert("Please set a rate");
       return;
     }
 
