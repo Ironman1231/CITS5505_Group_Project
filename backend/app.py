@@ -4,34 +4,14 @@ Application entry point.
 
 import os
 
-from flask import Flask, flash, redirect, render_template, request, url_for
-from flask_login import current_user, login_required, login_user, logout_user
-from flask_wtf.csrf import CSRFError
+from flask import Flask, flash, redirect, render_template, request, session, url_for
+from flask_login import login_required, login_user, logout_user
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from .config import Config
-from .extensions import csrf, db, login_manager, migrate
+from .extensions import db, login_manager, migrate
 from . import models  # noqa: F401
-from .models import CheckIn, Comment, Photo, User
-
-
-EXPLORE_CATEGORIES = {
-    "food": "Food & Drink",
-    "study": "Study Spot",
-    "nature": "Nature",
-    "nightlife": "Nightlife",
-    "shopping": "Shopping",
-    "other": "Other",
-}
-EXPLORE_SORT_OPTIONS = {
-    "newest": "Newest First",
-    "rating": "Highest Rated",
-}
-
-
-def escape_like_search(value):
-    """Escape SQL LIKE wildcard characters before building a search pattern."""
-    return value.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+from .models import User
 
 
 # Configure Flask to reuse the existing prototype templates and static files
@@ -55,11 +35,11 @@ migrate.init_app(
     db,
     directory=os.path.join(app.root_path, "migrations")
 ) # Use backend/migrations as the migration directory
+
 login_manager.init_app(app)
 login_manager.login_view = "login"
 login_manager.login_message = "Please log in to access this page."
 login_manager.login_message_category = "warning"
-csrf.init_app(app)
 
 
 @login_manager.user_loader
@@ -71,69 +51,19 @@ def load_user(user_id):
         return None
 
 
-@app.errorhandler(CSRFError)
-def handle_csrf_error(error):
-    """Show a friendly message when a submitted form is missing/has bad CSRF."""
-    flash("Security check failed. Please refresh the page and try again.", "danger")
-    return redirect(request.referrer or url_for("index"))
-
-
 @app.route("/")
 @app.route("/index.html")
 def index():
-    check_ins = CheckIn.query.order_by(CheckIn.created_at.desc()).all()
-    markers = [
-        {"lat": c.lat, "lng": c.lng, "title": c.title, "category": c.category}
-        for c in check_ins if c.lat is not None and c.lng is not None
-    ]
-    return render_template("index.html", check_ins=check_ins, markers=markers)
+    """Render the home page prototype"""
+    return render_template("index.html")
 
 @app.route("/explore")
 def explore_alias():
     return redirect(url_for("explore"))
 @app.route("/explore.html")
 def explore():
-    """Render the explore page with database-backed filters and sorting."""
-    selected_category = request.args.get("category", "").strip()
-    selected_min_rating = request.args.get("min_rating", "").strip()
-    selected_sort = request.args.get("sort", "newest").strip() or "newest"
-
-    if selected_category not in EXPLORE_CATEGORIES:
-        selected_category = ""
-    if selected_sort not in EXPLORE_SORT_OPTIONS:
-        selected_sort = "newest"
-
-    min_rating_value = None
-    if selected_min_rating:
-        try:
-            min_rating_value = float(selected_min_rating)
-        except ValueError:
-            selected_min_rating = ""
-
-    query = CheckIn.query
-    if selected_category:
-        query = query.filter(CheckIn.category == selected_category)
-    if min_rating_value is not None:
-        query = query.filter(CheckIn.rating >= min_rating_value)
-
-    if selected_sort == "rating":
-        query = query.order_by(CheckIn.rating.desc(), CheckIn.created_at.desc())
-    else:
-        query = query.order_by(CheckIn.created_at.desc())
-
-    check_ins = query.all()
-    filters = {
-        "category": selected_category,
-        "min_rating": selected_min_rating,
-        "sort": selected_sort,
-    }
-    return render_template(
-        "explore.html",
-        check_ins=check_ins,
-        filters=filters,
-        category_options=EXPLORE_CATEGORIES,
-        sort_options=EXPLORE_SORT_OPTIONS,
-    )
+    """Render the explore page prototype"""
+    return render_template("explore.html")
 
 
 @app.route("/checkin-details")
@@ -141,113 +71,17 @@ def checkin_details_alias():
     return redirect(url_for("checkin_details"))
 @app.route("/checkin_details.html")
 def checkin_details():
-    """Redirect the old prototype URL to the latest available detail page."""
-    check_in = CheckIn.query.order_by(CheckIn.created_at.desc()).first()
-    if not check_in:
-        return redirect(url_for("explore"))
-    return redirect(url_for("checkin_detail", checkin_id=check_in.id))
-
-
-@app.route("/checkins/<int:checkin_id>")
-def checkin_detail(checkin_id):
-    """Render one selected check-in from the database."""
-    check_in = db.get_or_404(CheckIn, checkin_id)
-    photos = check_in.photos.order_by(Photo.display_order.asc(), Photo.id.asc()).all()
-    comments = check_in.comments.order_by(Comment.created_at.desc()).all()
-    comments_count = len(comments)
-    favourites_count = check_in.favourites.count()
-    category = check_in.category if check_in.category in EXPLORE_CATEGORIES else "other"
-    detail_map = {
-        "lat": check_in.lat,
-        "lng": check_in.lng,
-        "title": check_in.title,
-        "category": EXPLORE_CATEGORIES.get(category, category.title()),
-    }
-    return render_template(
-        "checkin_details.html",
-        check_in=check_in,
-        photos=photos,
-        comments=comments,
-        comments_count=comments_count,
-        favourites_count=favourites_count,
-        category_key=category,
-        category_label=EXPLORE_CATEGORIES.get(category, category.title()),
-        detail_map=detail_map,
-    )
-
-
-@app.route("/checkins/<int:checkin_id>/comments", methods=["POST"])
-@login_required
-def add_comment(checkin_id):
-    """Save a logged-in user's comment for one check-in."""
-    check_in = db.get_or_404(CheckIn, checkin_id)
-    body = request.form.get("body", "").strip()
-
-    if not body:
-        flash("Please write a comment before posting.", "danger")
-        return redirect(url_for("checkin_detail", checkin_id=check_in.id))
-    if len(body) > 1000:
-        flash("Comments must be 1000 characters or fewer.", "danger")
-        return redirect(url_for("checkin_detail", checkin_id=check_in.id))
-
-    comment = Comment(
-        user_id=current_user.id,
-        checkin_id=check_in.id,
-        body=body,
-    )
-    db.session.add(comment)
-    db.session.commit()
-
-    flash("Comment posted successfully.", "success")
-    return redirect(url_for("checkin_detail", checkin_id=check_in.id))
+    """Render the check-in details page prototype"""
+    return render_template("checkin_details.html")
 
 
 @app.route("/new-checkin")
 def new_checkin_alias():
     return redirect(url_for("new_checkin"))
-
-@app.route("/new-checkin.html", methods=["GET", "POST"])
+@app.route("/new-checkin.html")
 @login_required
 def new_checkin():
-    if request.method == "POST":
-        # get information from the front end by id
-        title = request.form.get("title")
-        category = request.form.get("category")
-        description = request.form.get("description")
-        lat = float(request.form.get("lat"))
-        lng = float(request.form.get("lng"))
-
-        # for all data into a dictionary
-        form_data = {
-            "user_id": current_user.id,
-            "title": title,
-            "description": description,
-            "category": category,
-            "lat": lat,
-            "lng": lng
-        }
-
-        # get the user id who issue this post
-        user = User.query.filter(
-            (User.id == form_data["user_id"])
-        ).first()
-
-        check_in = CheckIn(
-            user_id = user.id,
-            title = form_data["title"],
-            description = form_data["description"],
-            category = form_data["category"],
-            lat = form_data["lat"],
-            lng = form_data["lng"]
-        )
-
-        db.session.add(check_in)
-        db.session.commit()
-
-        return redirect(url_for("index"))
-        
-
-    """Render the new check-in page prototype"""
+    """Render the new check-in page — login required."""
     return render_template("new-checkin.html")
 
 
@@ -260,17 +94,6 @@ def profile():
     return render_template("profile.html")
 
 
-# Original prototype-only login route:
-# @app.route("/login")
-# def login_alias():
-#     return redirect(url_for("login"))
-#
-# @app.route("/login.html")
-# def login():
-#     """Render the login page prototype"""
-#     return render_template("login.html")
-
-
 @app.route("/login")
 def login_alias():
     """Redirect to the login page"""
@@ -280,9 +103,6 @@ def login_alias():
 @app.route("/login.html", methods=["GET", "POST"])
 def login():
     """Log in an existing user and store their identity in the session."""
-    if current_user.is_authenticated:
-        return redirect(url_for("index"))
-
     if request.method == "POST":
         identifier = request.form.get("identifier", "").strip()
         password = request.form.get("password", "")
@@ -301,31 +121,18 @@ def login():
             return render_template("login.html", form_data=form_data)
 
         login_user(user)
-
         flash("Logged in successfully.", "success")
         return redirect(url_for("index"))
 
     return render_template("login.html", form_data={})
 
 
-@app.route("/logout", methods=["POST"])
-@login_required
+@app.route("/logout")
 def logout():
-    """Log out the current user with Flask-Login."""
+    """Log out the current user."""
     logout_user()
     flash("You have been logged out.", "success")
     return redirect(url_for("index"))
-
-
-# Original prototype-only register route:
-# @app.route("/register")
-# def register_alias():
-#     """Redirect to the registration page prototype"""
-#     return redirect(url_for("register"))
-#
-# @app.route("/register.html")
-# def register():
-#     return render_template("register.html")
 
 
 @app.route("/register")
@@ -335,9 +142,6 @@ def register_alias():
 @app.route("/register.html", methods=["GET", "POST"])
 def register():
     """Create a new user account from the registration form."""
-    if current_user.is_authenticated:
-        return redirect(url_for("index"))
-
     if request.method == "POST":
         username = request.form.get("username", "").strip()
         email = request.form.get("email", "").strip().lower()
@@ -367,32 +171,14 @@ def register():
             email=email,
             password_hash=generate_password_hash(password),
         )
-        db.session.add(user) # Add the new user to the session
-        db.session.commit() # Commit the session to save the user to the database
+        db.session.add(user)
+        db.session.commit()
 
         flash("Account created successfully. Please log in.", "success")
         return redirect(url_for("login"))
 
     return render_template("register.html", form_data={})
-@app.route("/search")
-def search():
-    query = request.args.get("q", "").strip()
-    if not query:
-        return redirect(url_for("explore"))
 
-    search_pattern = f"%{escape_like_search(query)}%"
-    check_ins = CheckIn.query.filter(
-        (CheckIn.title.ilike(search_pattern, escape="\\")) |
-        (CheckIn.description.ilike(search_pattern, escape="\\"))
-    ).order_by(CheckIn.created_at.desc()).all()
-    return render_template(
-        "explore.html",
-        check_ins=check_ins,
-        search_query=query,
-        filters={"category": "", "min_rating": "", "sort": "newest"},
-        category_options=EXPLORE_CATEGORIES,
-        sort_options=EXPLORE_SORT_OPTIONS,
-    )
 @app.route("/navbar.html")
 def navbar():
     """Render the navigation bar prototype"""
