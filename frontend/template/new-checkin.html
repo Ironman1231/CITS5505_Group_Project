@@ -80,7 +80,7 @@
               <div class="mt-2 text-muted">Click to upload photos</div>
               <div class="text-muted small">PNG, JPG up to 5 MB each</div>
             </label>
-            <input type="file" class="d-none" id="photo_input" multiple accept="image/*" />
+            <input type="file" class="d-none" id="photo-input" multiple accept="image/*" />
             <div id="photo-previews" class="mt-2 d-flex flex-wrap"></div>
           </div>
 
@@ -232,6 +232,17 @@
       pickerMap.invalidateSize(); // fix tile rendering after show
     }
   });
+
+  // photo upload
+  document.getElementById("photo-input").addEventListener("change", function() {
+    const previews = document.getElementById("preview-img");
+    previews.innerHTML = ''; // clear old previews
+
+    const file = this.files[0];
+    if (file) {
+      previews.src = URL.createObjectURL(file);
+    }
+  })
 
   /* ---- Live preview: title ---- */
   document.getElementById('title').addEventListener('input', function () {

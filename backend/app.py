@@ -72,7 +72,7 @@ s3 = boto3.client(
     's3',
     endpoint_url=f"https://{os.getenv("CLOUDFLARE_ACCOUNT_ID")}.r2.cloudflarestorage.com",
     aws_access_key_id=os.getenv('CLOUDFLARE_ACCESS_KEY_ID'),
-    aws_secret_access_key=os.getenv("CLOUDFLARE_SECRET_ACCESS_KEY")
+    aws_secret_access_key=os.getenv("CLOUDFLARE_SECRET_ACCESS_KEY"),
     region_name="auto"
 )
 
@@ -269,7 +269,7 @@ def new_checkin():
         lng = float(request.form.get("lng"))
 
         # image test
-        image = request.files.get("photo_input")
+        image = request.files.get("photo-input")
         if image:
             # generate unqiue filename to avoid conflicts
             ext = image.filename.rsplit('.', 1)[1].lower()
