@@ -19,6 +19,16 @@
 
 <main class="container py-4">
 
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="mb-3">
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} py-2" role="alert">{{ message }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
   <nav aria-label="breadcrumb" class="mb-3">
     <ol class="breadcrumb">
       <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Home</a></li>
@@ -128,21 +138,47 @@
         <h5 class="fw-bold mb-3">Comments ({{ comments_count }})</h5>
 
         <div class="comment-list mb-4">
-          <div class="bg-white border rounded-3 p-4 text-center">
-            <p class="text-muted mb-0">
-              Comments will be connected in the next task. This page is already showing the real comment count.
-            </p>
-          </div>
+          {% for comment in comments %}
+            <div class="comment-item mb-3">
+              <strong class="comment-author">{{ comment.author.username if comment.author else "Unknown user" }}</strong>
+              {% if comment.created_at %}
+                <small class="text-muted comment-time">{{ comment.created_at.strftime("%d %B %Y") }}</small>
+              {% endif %}
+              <p class="comment-body mb-0 mt-1">{{ comment.body }}</p>
+            </div>
+            {% if not loop.last %}
+              <hr />
+            {% endif %}
+          {% else %}
+            <div class="bg-white border rounded-3 p-4 text-center">
+              <p class="text-muted mb-0">No comments yet. Be the first to share your thoughts.</p>
+            </div>
+          {% endfor %}
         </div>
 
         <div class="comment-form-wrapper">
           <h6 class="fw-bold mb-2">Add a Comment</h6>
-          <form class="comment-form">
-            <div class="mb-3">
-              <textarea class="form-control comment-input" rows="3" placeholder="Comment posting will be implemented in the comments task." disabled></textarea>
+          {% if current_user.is_authenticated %}
+            <form class="comment-form" method="POST" action="{{ url_for('add_comment', checkin_id=check_in.id) }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+              <div class="mb-3">
+                <textarea
+                  class="form-control comment-input"
+                  name="body"
+                  rows="3"
+                  maxlength="1000"
+                  placeholder="Share your thoughts about this place..."
+                  required
+                ></textarea>
+              </div>
+              <button type="submit" class="btn btn-pp comment-submit">Post Comment</button>
+            </form>
+          {% else %}
+            <div class="bg-white border rounded-3 p-3">
+              <p class="text-muted mb-2">Please log in to post a comment.</p>
+              <a href="{{ url_for('login') }}" class="btn btn-outline-secondary btn-sm">Log In</a>
             </div>
-            <button type="button" class="btn btn-pp comment-submit" disabled>Post Comment</button>
-          </form>
+          {% endif %}
         </div>
 
       </div>
