@@ -37,6 +37,7 @@
     <div class="col-lg-7">
       <div class="bg-white rounded-3 shadow-sm p-4">
         <form id="checkin-form" method="POST" action="{{ url_for('new_checkin') }}" novalidate>
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
           <!-- Hidden rating input -->
           <input type="hidden" name="rating" id="rating-value" value="0" />
 

@@ -28,7 +28,14 @@
         </li>
       </ul>
       <form class="d-flex me-3" role="search" action="{{ url_for('search') }}" method="GET">
-        <input type="search" name="q" class="form-control form-control-sm" placeholder="Search places..." style="width:180px;" />
+        <input
+          type="search"
+          name="q"
+          class="form-control form-control-sm"
+          value="{{ search_query | default(request.args.get('q', '')) }}"
+          placeholder="Search places..."
+          style="width:180px;"
+        />
         <button class="btn btn-outline-secondary btn-sm ms-1" type="submit">Search</button>
       </form>
       <div class="d-flex gap-2">
@@ -42,9 +49,12 @@
         <a href="{{ url_for('login') }}" class="btn btn-outline-secondary btn-sm">Log In</a>
         <a href="{{ url_for('register') }}" class="btn btn-outline-secondary btn-sm">Register</a>
         -->
-        {% if session.get("user_id") %}
-          <span class="navbar-text small text-muted">Logged in as {{ session.get("username") }}</span>
-          <a href="{{ url_for('logout') }}" class="btn btn-outline-secondary btn-sm">Log Out</a>
+        {% if current_user.is_authenticated %}
+          <span class="navbar-text small text-muted">Logged in as {{ current_user.username }}</span>
+          <form method="post" action="{{ url_for('logout') }}" class="d-inline">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            <button type="submit" class="btn btn-outline-secondary btn-sm">Log Out</button>
+          </form>
         {% else %}
           <a href="{{ url_for('login') }}" class="btn btn-outline-secondary btn-sm">Log In</a>
           <a href="{{ url_for('register') }}" class="btn btn-outline-secondary btn-sm">Register</a>

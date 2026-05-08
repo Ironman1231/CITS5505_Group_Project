@@ -25,8 +25,10 @@
         <p class="text-muted mb-0 mt-1 small">Discover places around Perth &amp; UWA</p>
       </div>
       <div class="col-md-6">
-        <form class="d-flex">
+        <form class="d-flex" action="{{ url_for('search') }}" method="GET">
           <input type="text" class="form-control me-2"
+                 name="q"
+                 value="{{ search_query | default('') }}"
                  placeholder="Search by place name or description..." />
           <button class="btn btn-pp px-3" type="submit">Search</button>
         </form>
@@ -39,141 +41,75 @@
 <main class="container py-4">
 
   <!-- FILTER BAR -->
-  <div class="filter-bar d-flex flex-wrap gap-3 align-items-end">
+  <form class="filter-bar d-flex flex-wrap gap-3 align-items-end" action="{{ url_for('explore') }}" method="GET">
     <div>
       <label class="form-label small fw-semibold mb-1">Category</label>
-      <select class="form-select form-select-sm" style="min-width:160px;">
+      <select class="form-select form-select-sm" name="category" style="min-width:160px;">
         <option value="">All Categories</option>
-        <option value="food">Food &amp; Drink</option>
-        <option value="study">Study Spot</option>
-        <option value="nature">Nature</option>
-        <option value="nightlife">Nightlife</option>
-        <option value="shopping">Shopping</option>
-        <option value="other">Other</option>
+        {% for value, label in category_options.items() %}
+          <option value="{{ value }}" {% if filters.category == value %}selected{% endif %}>
+            {{ label }}
+          </option>
+        {% endfor %}
       </select>
     </div>
     <div>
       <label class="form-label small fw-semibold mb-1">Min Rating</label>
-      <select class="form-select form-select-sm" style="min-width:130px;">
+      <select class="form-select form-select-sm" name="min_rating" style="min-width:130px;">
         <option value="">Any Rating</option>
-        <option value="3">3+</option>
-        <option value="4">4+</option>
-        <option value="4.5">4.5+</option>
+        <option value="3" {% if filters.min_rating == "3" %}selected{% endif %}>3+</option>
+        <option value="4" {% if filters.min_rating == "4" %}selected{% endif %}>4+</option>
+        <option value="4.5" {% if filters.min_rating == "4.5" %}selected{% endif %}>4.5+</option>
       </select>
     </div>
     <div>
       <label class="form-label small fw-semibold mb-1">Sort By</label>
-      <select class="form-select form-select-sm" style="min-width:160px;">
-        <option value="newest">Newest First</option>
-        <option value="rating">Highest Rated</option>
-        <option value="comments">Most Comments</option>
+      <select class="form-select form-select-sm" name="sort" style="min-width:160px;">
+        {% for value, label in sort_options.items() %}
+          <option value="{{ value }}" {% if filters.sort == value %}selected{% endif %}>
+            {{ label }}
+          </option>
+        {% endfor %}
+        <!-- Most Comments is intentionally left out until comment counts are implemented in #65. -->
       </select>
     </div>
     <div class="ms-auto">
-      <button class="btn btn-pp btn-sm">Apply Filters</button>
-      <button class="btn btn-outline-secondary btn-sm ms-2">Reset</button>
+      <button class="btn btn-pp btn-sm" type="submit">Apply Filters</button>
+      <a class="btn btn-outline-secondary btn-sm ms-2" href="{{ url_for('explore') }}">Reset</a>
     </div>
-  </div>
+  </form>
 
-  <p class="text-muted small mb-3">Showing <strong>12</strong> check-ins</p>
+  {% if search_query is defined and search_query %}
+    <div class="search-summary bg-white border rounded-3 px-3 py-2 mb-3">
+      <span class="small text-muted">Search results for</span>
+      <strong class="text-green">"{{ search_query }}"</strong>
+    </div>
+  {% endif %}
+
+  <p class="text-muted small mb-3">
+    Showing <strong>{{ check_ins | length }}</strong> check-ins
+  </p>
 
 
   <!-- CARDS GRID -->
   <div class="row g-4">
 
-    <!-- CARD 1 — Matilda Bay -->
-    <div class="col-sm-6 col-lg-4 col-xl-3">
-      <div class="card checkin-card h-100">
-        <img src="https://picsum.photos/400/300?random=21" class="card-img-top" alt="Matilda Bay" />
-        <div class="card-body">
-          <span class="cat-label cat-nature mb-1">Nature</span>
-          <h5 class="card-title">Matilda Bay</h5>
-          <div class="mb-1"><span class="rating-num">4.5</span></div>
-          <p class="card-text">Sunset views just beside UWA campus are absolutely stunning...</p>
-          <div class="d-flex align-items-center justify-content-between mt-2">
-            <small class="text-muted">perthwanderer</small>
-            <button class="btn btn-sm btn-outline-secondary btn-fav">Favourite</button>
-          </div>
-        </div>
-        <div class="card-footer bg-transparent border-0 pt-0">
-          <a href="checkin_details.html" class="btn btn-sm btn-outline-secondary w-100">View Details</a>
+    {% for check_in in check_ins %}
+      {% include "_checkin_card.html" %}
+    {% else %}
+      <div class="col-12">
+        <div class="bg-white border rounded-3 shadow-sm text-center p-5">
+          <h3 class="h5 fw-bold text-green mb-2">No check-ins found</h3>
+          {% if search_query is defined and search_query %}
+            <p class="text-muted mb-0">No places matched "{{ search_query }}". Try another keyword or clear the search.</p>
+          {% else %}
+            <p class="text-muted mb-0">Try changing your filters later, or create the first check-in.</p>
+          {% endif %}
         </div>
       </div>
-    </div>
-
-    <!-- CARD 2 — Kings Park Botanic Garden -->
-    <div class="col-sm-6 col-lg-4 col-xl-3">
-      <div class="card checkin-card h-100">
-        <img src="https://picsum.photos/400/300?random=12" class="card-img-top" alt="Kings Park" />
-        <div class="card-body">
-          <span class="cat-label cat-nature mb-1">Nature</span>
-          <h5 class="card-title">Kings Park Botanic Garden</h5>
-          <div class="mb-1"><span class="rating-num">4.8</span></div>
-          <p class="card-text">Wildflower season is breathtaking — absolutely worth the visit!</p>
-          <div class="d-flex align-items-center justify-content-between mt-2">
-            <small class="text-muted">sunset_chaser</small>
-            <button class="btn btn-sm btn-outline-secondary btn-fav">Favourite</button>
-          </div>
-        </div>
-        <div class="card-footer bg-transparent border-0 pt-0">
-          <a href="#" class="btn btn-sm btn-outline-secondary w-100">View Details</a>
-        </div>
-      </div>
-    </div>
-
-    <!-- CARD 3 — Chicho Gelato -->
-    <div class="col-sm-6 col-lg-4 col-xl-3">
-      <div class="card checkin-card h-100">
-        <img src="https://picsum.photos/400/300?random=13" class="card-img-top" alt="Chicho Gelato" />
-        <div class="card-body">
-          <span class="cat-label cat-food mb-1">Food &amp; Drink</span>
-          <h5 class="card-title">Chicho Gelato</h5>
-          <div class="mb-1"><span class="rating-num">4.6</span></div>
-          <p class="card-text">Best gelato in Perth — always a queue but absolutely worth the wait...</p>
-          <div class="d-flex align-items-center justify-content-between mt-2">
-            <small class="text-muted">uwa_foodie</small>
-            <button class="btn btn-sm btn-outline-secondary btn-fav">Favourite</button>
-          </div>
-        </div>
-        <div class="card-footer bg-transparent border-0 pt-0">
-          <a href="#" class="btn btn-sm btn-outline-secondary w-100">View Details</a>
-        </div>
-      </div>
-    </div>
-
-    <!-- CARD 4 — Reid Library -->
-    <div class="col-sm-6 col-lg-4 col-xl-3">
-      <div class="card checkin-card h-100">
-        <img src="https://picsum.photos/400/300?random=14" class="card-img-top" alt="Reid Library" />
-        <div class="card-body">
-          <span class="cat-label cat-study mb-1">Study Spot</span>
-          <h5 class="card-title">Reid Library</h5>
-          <div class="mb-1"><span class="rating-num">4.2</span></div>
-          <p class="card-text">Best study spot on campus — especially level 4 with the views...</p>
-          <div class="d-flex align-items-center justify-content-between mt-2">
-            <small class="text-muted">studyspot_hunter</small>
-            <button class="btn btn-sm btn-outline-secondary btn-fav">Favourite</button>
-          </div>
-        </div>
-        <div class="card-footer bg-transparent border-0 pt-0">
-          <a href="#" class="btn btn-sm btn-outline-secondary w-100">View Details</a>
-        </div>
-      </div>
-    </div>
+    {% endfor %}
 
   </div><!-- /row -->
-
-
-  <!-- PAGINATION -->
-  <nav class="mt-5" aria-label="Page navigation">
-    <ul class="pagination justify-content-center">
-      <li class="page-item disabled"><a class="page-link" href="#">Previous</a></li>
-      <li class="page-item active"><a class="page-link" href="#">1</a></li>
-      <li class="page-item"><a class="page-link" href="#">2</a></li>
-      <li class="page-item"><a class="page-link" href="#">3</a></li>
-      <li class="page-item"><a class="page-link" href="#">Next</a></li>
-    </ul>
-  </nav>
 
 </main>
 

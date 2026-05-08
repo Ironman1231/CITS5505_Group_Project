@@ -5,12 +5,13 @@ Application entry point.
 import os
 
 from flask import Flask, flash, redirect, render_template, request, session, url_for
+from flask_login import login_required, login_user, logout_user
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from .config import Config
-from .extensions import db, migrate
+from .extensions import db, login_manager, migrate
 from . import models  # noqa: F401
-from .models import User, CheckIn
+from .models import User
 
 
 # Configure Flask to reuse the existing prototype templates and static files
@@ -35,11 +36,26 @@ migrate.init_app(
     directory=os.path.join(app.root_path, "migrations")
 ) # Use backend/migrations as the migration directory
 
+login_manager.init_app(app)
+login_manager.login_view = "login"
+login_manager.login_message = "Please log in to access this page."
+login_manager.login_message_category = "warning"
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    """Load the current user for Flask-Login from the SQLAlchemy model."""
+    try:
+        return db.session.get(User, int(user_id))
+    except (TypeError, ValueError):
+        return None
+
 
 @app.route("/")
 @app.route("/index.html")
 def index():
     """Render the home page prototype"""
+
     # get all data from the check_in table of data base, just like SELECT * FROM check_in
     new_check_ins = CheckIn.query.all()
 
@@ -66,51 +82,10 @@ def checkin_details():
 @app.route("/new-checkin")
 def new_checkin_alias():
     return redirect(url_for("new_checkin"))
-
-@app.route("/new-checkin.html", methods=["GET", "POST"])
+@app.route("/new-checkin.html")
+@login_required
 def new_checkin():
-    if request.method == "POST":
-        if not session.get("user_id"):
-            return render_template(url_for("new_checkin"), login_status=False)
-        
-        # get information from the front end by id
-        title = request.form.get("title")
-        category = request.form.get("category")
-        description = request.form.get("description")
-        lat = float(request.form.get("lat"))
-        lng = float(request.form.get("lng"))
-
-        # for all data into a dictionary
-        form_data = {
-            "user_id": session["user_id"],
-            "title": title,
-            "description": description,
-            "category": category,
-            "lat": lat,
-            "lng": lng
-        }
-
-        # get the user id who issue this post
-        user = User.query.filter(
-            (User.id == form_data["user_id"])
-        ).first()
-
-        check_in = CheckIn(
-            user_id = user.id,
-            title = form_data["title"],
-            description = form_data["description"],
-            category = form_data["category"],
-            lat = form_data["lat"],
-            lng = form_data["lng"]
-        )
-
-        db.session.add(check_in)
-        db.session.commit()
-
-        return redirect(url_for("index"))
-        
-
-    """Render the new check-in page prototype"""
+    """Render the new check-in page — login required."""
     return render_template("new-checkin.html")
 
 
@@ -121,17 +96,6 @@ def profile_alias():
 def profile():
     """Render the user profile page prototype"""
     return render_template("profile.html")
-
-
-# Original prototype-only login route:
-# @app.route("/login")
-# def login_alias():
-#     return redirect(url_for("login"))
-#
-# @app.route("/login.html")
-# def login():
-#     """Render the login page prototype"""
-#     return render_template("login.html")
 
 
 @app.route("/login")
@@ -160,10 +124,7 @@ def login():
             flash("Invalid username/email or password.", "danger")
             return render_template("login.html", form_data=form_data)
 
-        session.clear()
-        session["user_id"] = user.id
-        session["username"] = user.username
-
+        login_user(user)
         flash("Logged in successfully.", "success")
         return redirect(url_for("index"))
 
@@ -172,21 +133,10 @@ def login():
 
 @app.route("/logout")
 def logout():
-    """Log out the current user by clearing the session."""
-    session.clear()
+    """Log out the current user."""
+    logout_user()
     flash("You have been logged out.", "success")
     return redirect(url_for("index"))
-
-
-# Original prototype-only register route:
-# @app.route("/register")
-# def register_alias():
-#     """Redirect to the registration page prototype"""
-#     return redirect(url_for("register"))
-#
-# @app.route("/register.html")
-# def register():
-#     return render_template("register.html")
 
 
 @app.route("/register")
@@ -225,17 +175,14 @@ def register():
             email=email,
             password_hash=generate_password_hash(password),
         )
-        db.session.add(user) # Add the new user to the session
-        db.session.commit() # Commit the session to save the user to the database
+        db.session.add(user)
+        db.session.commit()
 
         flash("Account created successfully. Please log in.", "success")
         return redirect(url_for("login"))
 
     return render_template("register.html", form_data={})
-@app.route("/search")
-def search():
-    query = request.args.get("q", "").strip()
-    return render_template("explore.html", search_query=query)
+
 @app.route("/navbar.html")
 def navbar():
     """Render the navigation bar prototype"""
