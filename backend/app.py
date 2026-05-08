@@ -14,6 +14,12 @@ from .extensions import csrf, db, login_manager, migrate
 from . import models  # noqa: F401
 from .models import CheckIn, Comment, Photo, User
 
+# import cloudflare R2
+import boto3
+from dotenv import load_dotenv
+
+from werkzeug.utils import secure_filename
+import uuid
 
 EXPLORE_CATEGORIES = {
     "food": "Food & Drink",
@@ -60,6 +66,31 @@ login_manager.login_view = "login"
 login_manager.login_message = "Please log in to access this page."
 login_manager.login_message_category = "warning"
 csrf.init_app(app)
+
+# set up cloudflare s3
+s3 = boto3.client(
+    's3',
+    endpoint_url=f"https://{os.getenv("CLOUDFLARE_ACCOUNT_ID")}.r2.cloudflarestorage.com",
+    aws_access_key_id=os.getenv('CLOUDFLARE_ACCESS_KEY_ID'),
+    aws_secret_access_key=os.getenv("CLOUDFLARE_SECRET_ACCESS_KEY")
+    region_name="auto"
+)
+
+# upload image to cloudflare R2
+def upload_image(file, filename):
+    """Upload an image to R2 and return the public URL"""
+    bucket = os.getenv("CLOUDFLARE_BUCKET_NAME")
+
+    s3.upload_fileob(
+        file,
+        bucket,
+        filename,
+        ExtraArgs={"ContentType": file.content_type}
+    )
+
+    # return the public URL
+    public_url = os.getenv("CLOUDFLARE_PUBLIC_URL")
+    return f"{public_url}/{filename}"
 
 
 @login_manager.user_loader
@@ -236,6 +267,14 @@ def new_checkin():
         description = request.form.get("description")
         lat = float(request.form.get("lat"))
         lng = float(request.form.get("lng"))
+
+        # image test
+        image = request.files.get("photo_input")
+        if image:
+            # generate unqiue filename to avoid conflicts
+            ext = image.filename.rsplit('.', 1)[1].lower()
+            filename = f"{uuid.uuid4()}.{ext}"
+            image_url = upload_image(image, filename)
 
         # for all data into a dictionary
         form_data = {
