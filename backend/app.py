@@ -279,15 +279,6 @@ def new_checkin():
         lat = float(request.form.get("lat"))
         lng = float(request.form.get("lng"))
 
-        # image test
-        image = request.files.get("input_image")
-        if image:
-            # generate unqiue filename to avoid conflicts
-            ext = image.filename.rsplit('.', 1)[1].lower()
-            filename = f"{uuid.uuid4()}.{ext}"
-            image_url = upload_image(image, filename)
-            print("Uploaded:", image_url)  # debug
-
         # for all data into a dictionary
         form_data = {
             "user_id": current_user.id,
@@ -313,8 +304,24 @@ def new_checkin():
         )
 
         db.session.add(check_in)
-        db.session.commit()
+        # db.session.commit()
+        db.session.flush()
 
+        # image test
+        image = request.files.get("input_image")
+        if image:
+            # generate unqiue filename to avoid conflicts
+            ext = image.filename.rsplit('.', 1)[1].lower()
+            filename = f"{uuid.uuid4()}.{ext}"
+            image_url = upload_image(image, filename)
+            
+            new_photo = Photo(
+                checkin_id = check_in.id,
+                url = image_url
+            )
+            db.session.add(new_photo)
+        
+        db.session.commit()
         return redirect(url_for("index"))
         
 
