@@ -88,7 +88,7 @@ def index():
     ]
     return render_template("index.html", check_ins=check_ins, markers=markers)
 
-@app.route("/explore")
+@app.route("/explore")    
 def explore_alias():
     return redirect(url_for("explore"))
 @app.route("/explore.html")
@@ -175,21 +175,19 @@ def checkin_detail(checkin_id):
         detail_map=detail_map,
     )
 
-
+    
 @app.route("/checkins/<int:checkin_id>/comments", methods=["POST"])
 @login_required
 def add_comment(checkin_id):
     """Save a logged-in user's comment for one check-in."""
     check_in = db.get_or_404(CheckIn, checkin_id)
     body = request.form.get("body", "").strip()
-
     if not body:
         flash("Please write a comment before posting.", "danger")
         return redirect(url_for("checkin_detail", checkin_id=check_in.id))
     if len(body) > 1000:
         flash("Comments must be 1000 characters or fewer.", "danger")
         return redirect(url_for("checkin_detail", checkin_id=check_in.id))
-
     comment = Comment(
         user_id=current_user.id,
         checkin_id=check_in.id,
@@ -197,9 +195,31 @@ def add_comment(checkin_id):
     )
     db.session.add(comment)
     db.session.commit()
-
     flash("Comment posted successfully.", "success")
     return redirect(url_for("checkin_detail", checkin_id=check_in.id))
+
+
+@app.route("/checkins/<int:checkin_id>/favourite", methods=["POST"])
+@login_required
+def toggle_favourite(checkin_id):
+    """Toggle the current user's favourite on a check-in."""
+    check_in = db.get_or_404(CheckIn, checkin_id)
+    existing = models.Favourite.query.filter_by(
+        user_id=current_user.id,
+        checkin_id=checkin_id,
+    ).first()
+    if existing:
+        db.session.delete(existing)
+        db.session.commit()
+        flash("Removed from favourites.", "info")
+    else:
+        db.session.add(models.Favourite(
+            user_id=current_user.id,
+            checkin_id=checkin_id,
+        ))
+        db.session.commit()
+        flash("Added to favourites!", "success")
+    return redirect(url_for("checkin_detail", checkin_id=checkin_id))
 
 
 @app.route("/new-checkin")
