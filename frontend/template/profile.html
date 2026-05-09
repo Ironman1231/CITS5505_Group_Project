@@ -123,11 +123,11 @@
       </div>
 
       <!-- Load more -->
-      <div class="text-center mt-4">
+      <!-- <div class="text-center mt-4">
         <button class="btn btn-outline-secondary px-4">
           Load More <i class="bi bi-chevron-down ms-1"></i>
         </button>
-      </div>
+      </div> -->
     </div><!-- /mycheckins tab -->
 
 
@@ -249,7 +249,7 @@
 <script>loadComponent('navbar-placeholder', 'navbar.html');</script>
 -->
 
-{% with messages = get_flashed_messages() %}
+{% with messages = get_flashed_messages(with_categories = True) %}
   {% if messages %}
     {% for category, message in messages %}
       {% if category == "baduser" %}

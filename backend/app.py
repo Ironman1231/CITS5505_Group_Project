@@ -378,12 +378,14 @@ def profile():
         return render_template("profile.html")
     else:
         check_ins = CheckIn.query.filter(CheckIn.user_id == user.id).all()
+        favourites = user.favourites.all()
         sum_rating = 0
         avg_rating = 0
-        for check_in in check_ins:
-            sum_rating += check_in.rating
-        avg_rating = sum_rating / len(check_ins)
-        return render_template("profile.html", user = user, check_ins = check_ins, avg_rating = round(avg_rating, 1))
+        if len(check_ins) != 0:
+            for check_in in check_ins:
+                sum_rating += check_in.rating
+            avg_rating = sum_rating / len(check_ins)
+        return render_template("profile.html", user = user, check_ins = check_ins, avg_rating = round(avg_rating, 1), favourites = favourites)
 
 
 # Original prototype-only login route:

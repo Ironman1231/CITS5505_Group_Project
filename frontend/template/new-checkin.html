@@ -349,19 +349,36 @@
     this.submit();
   });
 
-  {% if login_status == False %}
-    const modal = new bootstrap.Modal(document.getElementById("login_modal"));
-    modal.show()
-  {% endif %}
+  // {% if login_status == False %}
+  //   const modal = new bootstrap.Modal(document.getElementById("login_modal"));
+  //   modal.show()
+  // {% endif %}
 
-  {% with messages = get_flashed_messages() %}
-    {% if messages %}
-      {% for message in messages %}
-        alert("{{ message }}");
-      {% endfor %}
-    {% endif %}
-  {% endwith %}
+  // {% with messages = get_flashed_messages() %}
+  //   {% if messages %}
+  //     {% for message in messages %}
+  //       alert("{{ message }}");
+  //     {% endfor %}
+  //   {% endif %}
+  // {% endwith %}
 </script>
+
+{% if login_status == False %}
+<script>
+  const modal = new bootstrap.Modal(document.getElementById("login_modal"));
+  modal.show()
+</script>
+{% endif %}
+
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    {% for message in messages %}
+    <script>
+      alert("{{ message }}");
+    </script>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
 
 </body>
 </html>
