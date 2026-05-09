@@ -28,15 +28,18 @@
              class="profile-avatar" alt="perthwanderer avatar" />
       </div>
       <div class="col">
-        <h1 class="h3 fw-bold mb-0">perthwanderer</h1>
+        <h1 class="h3 fw-bold mb-0">{{ user.username }}</h1>
         <p class="mb-1 opacity-75 small">
           <i class="bi bi-geo-alt me-1"></i>Perth, WA
           <span class="mx-2">|</span>
-          <i class="bi bi-calendar3 me-1"></i>Joined January 2024
+          <i class="bi bi-calendar3 me-1"></i>Joined {{ user.created_at.strftime("%Y-%m-%d") }}
         </p>
         <p class="mb-0 small" style="max-width:480px;">
-          Exploring every corner of Perth and UWA — always searching for the best sunset spots,
-          hidden cafes, and quiet study retreats.
+          {% if user.bio == None %}
+            You currently have no biograph, please created one!
+          {% else %}
+            {{ user.bio }}
+          {% endif %}
         </p>
       </div>
       <!-- Edit profile button (own profile) -->
@@ -51,7 +54,7 @@
     <div class="row mt-4 g-0 text-white">
       <div class="col-auto">
         <div class="stat-box">
-          <div class="stat-num">47</div>
+          <div class="stat-num">{{ check_ins | length }}</div>
           <div class="stat-label">Check-ins</div>
         </div>
       </div>
@@ -63,7 +66,7 @@
       </div>
       <div class="col-auto">
         <div class="stat-box">
-          <div class="stat-num">4.3</div>
+          <div class="stat-num">{{ avg_rating }}</div>
           <div class="stat-label">Avg Rating</div>
         </div>
       </div>
@@ -87,7 +90,7 @@
       <a class="nav-link active" id="mycheckins-tab"
          data-bs-toggle="tab" href="#mycheckins" role="tab">
         <i class="bi bi-grid me-1"></i>My Check-ins
-        <span class="badge bg-secondary ms-1">47</span>
+        <span class="badge bg-secondary ms-1">{{ check_ins | length }}</span>
       </a>
     </li>
     <li class="nav-item">
@@ -105,142 +108,17 @@
     <div class="tab-pane fade show active" id="mycheckins" role="tabpanel">
       <div class="row g-4">
 
-        <!-- Card 1 -->
-        <div class="col-sm-6 col-lg-4">
-          <div class="card checkin-card h-100">
-            <img src="https://picsum.photos/400/300?random=71" class="card-img-top" alt="Matilda Bay" />
-            <div class="card-body">
-              <span class="badge badge-nature mb-2">Nature</span>
-              <h5 class="card-title">Matilda Bay</h5>
-              <div class="stars mb-1">
-                <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
-                <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
-                <i class="bi bi-star-half"></i>
-                <small class="text-muted ms-1">4.5</small>
-              </div>
-              <p class="card-text">Sunset views just beside UWA campus are absolutely stunning...</p>
-              <small class="text-muted"><i class="bi bi-calendar3 me-1"></i>12 Mar 2025</small>
-            </div>
-            <div class="card-footer bg-transparent border-0 d-flex gap-2">
-              <a href="checkin_details.html" class="btn btn-sm btn-outline-secondary flex-grow-1">View</a>
-              <button class="btn btn-sm btn-outline-danger" aria-label="Delete check-in"><i class="bi bi-trash"></i></button>
+        {% for check_in in check_ins %}
+          {% include "_checkin_card.html" %}
+        {% else %}
+          <div class="col-12">
+            <div class="bg-white border rounded-3 shadow-sm text-center p-5">
+              <h3 class="h5 fw-bold text-green mb-2">No check-ins yet</h3>
+              <p class="text-muted mb-3">Be the first to share a hidden gem around Perth or UWA.</p>
+              <a href="{{ url_for('new_checkin') }}" class="btn btn-pp">Share Your Discovery</a>
             </div>
           </div>
-        </div>
-
-        <!-- Card 2 -->
-        <div class="col-sm-6 col-lg-4">
-          <div class="card checkin-card h-100">
-            <img src="https://picsum.photos/400/300?random=72" class="card-img-top" alt="Kings Park" />
-            <div class="card-body">
-              <span class="badge badge-nature mb-2">Nature</span>
-              <h5 class="card-title">Kings Park Botanic Garden</h5>
-              <div class="stars mb-1">
-                <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
-                <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
-                <i class="bi bi-star-fill"></i>
-                <small class="text-muted ms-1">4.8</small>
-              </div>
-              <p class="card-text">Wildflower season is breathtaking, absolutely worth the visit!</p>
-              <small class="text-muted"><i class="bi bi-calendar3 me-1"></i>5 Mar 2025</small>
-            </div>
-            <div class="card-footer bg-transparent border-0 d-flex gap-2">
-              <a href="checkin_details.html" class="btn btn-sm btn-outline-secondary flex-grow-1">View</a>
-              <button class="btn btn-sm btn-outline-danger" aria-label="Delete check-in"><i class="bi bi-trash"></i></button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Card 3 -->
-        <div class="col-sm-6 col-lg-4">
-          <div class="card checkin-card h-100">
-            <img src="https://picsum.photos/400/300?random=73" class="card-img-top" alt="Elizabeth Quay" />
-            <div class="card-body">
-              <span class="badge badge-nature mb-2">Nature</span>
-              <h5 class="card-title">Elizabeth Quay</h5>
-              <div class="stars mb-1">
-                <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
-                <i class="bi bi-star-fill"></i>
-                <i class="bi bi-star-half"></i>
-                <small class="text-muted ms-1">3.9</small>
-              </div>
-              <p class="card-text">Nice waterfront area, a bit touristy but great night views...</p>
-              <small class="text-muted"><i class="bi bi-calendar3 me-1"></i>28 Feb 2025</small>
-            </div>
-            <div class="card-footer bg-transparent border-0 d-flex gap-2">
-              <a href="checkin_details.html" class="btn btn-sm btn-outline-secondary flex-grow-1">View</a>
-              <button class="btn btn-sm btn-outline-danger" aria-label="Delete check-in"><i class="bi bi-trash"></i></button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Card 4 -->
-        <div class="col-sm-6 col-lg-4">
-          <div class="card checkin-card h-100">
-            <img src="https://picsum.photos/400/300?random=74" class="card-img-top" alt="Optus Stadium" />
-            <div class="card-body">
-              <span class="badge badge-nature mb-2">Nature</span>
-              <h5 class="card-title">Optus Stadium Riverside</h5>
-              <div class="stars mb-1">
-                <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
-                <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
-                <i class="bi bi-star-half"></i>
-                <small class="text-muted ms-1">4.1</small>
-              </div>
-              <p class="card-text">A relaxing loop around the stadium along the river...</p>
-              <small class="text-muted"><i class="bi bi-calendar3 me-1"></i>20 Feb 2025</small>
-            </div>
-            <div class="card-footer bg-transparent border-0 d-flex gap-2">
-              <a href="checkin_details.html" class="btn btn-sm btn-outline-secondary flex-grow-1">View</a>
-              <button class="btn btn-sm btn-outline-danger" aria-label="Delete check-in"><i class="bi bi-trash"></i></button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Card 5 -->
-        <div class="col-sm-6 col-lg-4">
-          <div class="card checkin-card h-100">
-            <img src="https://picsum.photos/400/300?random=75" class="card-img-top" alt="Fremantle Markets" />
-            <div class="card-body">
-              <span class="badge badge-shopping mb-2">Shopping</span>
-              <h5 class="card-title">Fremantle Markets</h5>
-              <div class="stars mb-1">
-                <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
-                <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
-                <i class="bi bi-star-half"></i>
-                <small class="text-muted ms-1">4.3</small>
-              </div>
-              <p class="card-text">Weekend market with local food and handmade crafts...</p>
-              <small class="text-muted"><i class="bi bi-calendar3 me-1"></i>15 Feb 2025</small>
-            </div>
-            <div class="card-footer bg-transparent border-0 d-flex gap-2">
-              <a href="checkin_details.html" class="btn btn-sm btn-outline-secondary flex-grow-1">View</a>
-              <button class="btn btn-sm btn-outline-danger" aria-label="Delete check-in"><i class="bi bi-trash"></i></button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Card 6 -->
-        <div class="col-sm-6 col-lg-4">
-          <div class="card checkin-card h-100">
-            <img src="https://picsum.photos/400/300?random=76" class="card-img-top" alt="Leederville" />
-            <div class="card-body">
-              <span class="badge badge-food mb-2">Food &amp; Drink</span>
-              <h5 class="card-title">Leederville Coffee Strip</h5>
-              <div class="stars mb-1">
-                <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
-                <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
-                <small class="text-muted ms-1">4.0</small>
-              </div>
-              <p class="card-text">Oxford St has so many great brunch spots along the strip...</p>
-              <small class="text-muted"><i class="bi bi-calendar3 me-1"></i>10 Feb 2025</small>
-            </div>
-            <div class="card-footer bg-transparent border-0 d-flex gap-2">
-              <a href="checkin_details.html" class="btn btn-sm btn-outline-secondary flex-grow-1">View</a>
-              <button class="btn btn-sm btn-outline-danger" aria-label="Delete check-in"><i class="bi bi-trash"></i></button>
-            </div>
-          </div>
-        </div>
+        {% endfor %}
 
       </div>
 
@@ -361,6 +239,7 @@
 
   </div><!-- /tab-content -->
 
+  {% include "login_popup.html" %}
 </main>
 
 
@@ -369,6 +248,20 @@
 <!--
 <script>loadComponent('navbar-placeholder', 'navbar.html');</script>
 -->
+
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    {% for category, message in messages %}
+      {% if category == "baduser" %}
+        <script>
+          const modal = new bootstrap.Modal(document.getElementById("login_modal"));
+          modal.show()
+        </script>
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
 
 </body>
 </html>
