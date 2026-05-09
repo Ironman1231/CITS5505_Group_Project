@@ -27,14 +27,16 @@
 <!-- ===================== PROFILE HEADER ===================== -->
 <div class="profile-header">
   <div class="container">
-    <form action="{{ url_for('update_profile') }}" method="post" enctype="multipart/form-data">
+    <form id="edit_form" action="{{ url_for('update_profile') }}" method="POST" enctype="multipart/form-data">
+      <!-- the following input is necessary!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
       <div class="row align-items-center g-3">
         <!-- Avatar + name -->
         <div class="col-auto">
-          <!-- view mode -->
+          <!-- avatar view mode -->
           <img id="avator_image" src="{{ image_url }}"
               class="profile-avatar" alt="perthwanderer avatar" />
-          <!-- edit mode -->
+          <!-- avatar edit mode -->
           <label id="avatar_label" for="photo_input" class="d-none position-relative d-inline-block rounded-circle overflow-hidden" style="cursor:pointer;">
               <img id="new_avator_image" src="{{ image_url }}"
               class="profile-avatar" alt="perthwanderer avatar" />
@@ -46,16 +48,16 @@
           <input id="record_change" class="d-none" name="is_changed" value="False">
         </div>
         <div class="col">
-          <!-- view mode -->
+          <!-- usrname view mode -->
           <h1 id="username_view" class="h3 fw-bold mb-0">{{ user.username }}</h1>
-          <!-- edit mode -->
+          <!-- username edit mode -->
           <input id="username_edit" class="d-none" type="text" name="new_username" value="{{ user.username }}" placeholder="Please enter a user name" required/>
           <p class="mb-1 opacity-75 small">
             <i class="bi bi-geo-alt me-1"></i>Perth, WA
             <span class="mx-2">|</span>
             <i class="bi bi-calendar3 me-1"></i>Joined {{ user.created_at.strftime("%Y-%m-%d") }}
           </p>
-          <!-- view mode -->
+          <!-- bio view mode -->
           <p id="bio_view" class="mb-0 small" style="max-width:480px;">
             {% if user.bio == None %}
               You currently have no biograph, please created one!
@@ -63,17 +65,17 @@
               {{ user.bio }}
             {% endif %}
           </p>
-          <!-- edit mode -->
+          <!-- bio edit mode -->
           <textarea id="bio_edit" class="d-none form-control" name="new_bio" style="max-width:480px; resize: none;" required></textarea>
         </div>
         <!-- Edit profile button (own profile) -->
         <div class="col-auto">
-          <!-- view mode -->
-          <a id="edit_button" href="#" class="btn btn-light btn-sm">
+          <!-- edit button -->
+          <button id="edit_button" type="button" class="btn btn-light btn-sm">
             <i class="bi bi-pencil me-1"></i>Edit Profile
-          </a>
-          <!-- edit mode -->
-          <input type="submit" id="save_button" value="💾 Save Edit" class="d-none btn btn-light btn-sm"/>
+          </button>
+          <!-- submit button -->
+          <input id="save_button" type="submit" value="💾 Save Edit" class="d-none btn btn-light btn-sm"/>
         </div>
       </div>
     </form>
@@ -209,7 +211,7 @@
     this.classList.add("d-none");
     save_button.classList.remove("d-none");
 
-    bio_edit.innerTEXT = bio_view.innerTEXT.trim();
+    bio_edit.value = bio_view.innerText.trim();
     
     return;
   })
@@ -228,8 +230,9 @@
     return;
   })
 
-  document.getElementById("save_button").addEventListener("submit", function(e) {
+  document.getElementById("edit_form").addEventListener("submit", function(e) {
     e.preventDefault();
+
     const inputs = this.querySelectorAll('[required]');
     inputs.forEach((input) => {
       if (input.value === '') {
@@ -237,7 +240,6 @@
         return;
       }
     })
-    
     this.submit()
   })
 </script>
