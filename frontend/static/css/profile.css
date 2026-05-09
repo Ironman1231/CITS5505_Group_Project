@@ -46,3 +46,12 @@
 .stars .bi-star-fill { color: #ffc107; font-size: 0.85rem; }
 .stars .bi-star-half { color: #ffc107; font-size: 0.85rem; }
 .stars .bi-star      { color: #ccc;    font-size: 0.85rem; }
+
+.avatar-hover-text {
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.avatar-hover-text:hover {
+  opacity: 1;
+}

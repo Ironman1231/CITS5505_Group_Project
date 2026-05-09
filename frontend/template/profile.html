@@ -17,38 +17,65 @@
 -->
 {% include "navbar.html" %}
 
+<!-- set the url of avatar -->
+{% if not user.avatar_url %}
+  {% set image_url = "https://picsum.photos/100/100?random=101" %}
+{% else %}
+  {% set image_url = user.avatar_url %}
+{%endif%}
 
 <!-- ===================== PROFILE HEADER ===================== -->
 <div class="profile-header">
   <div class="container">
-    <div class="row align-items-center g-3">
-      <!-- Avatar + name -->
-      <div class="col-auto">
-        <img src="https://picsum.photos/100/100?random=101"
-             class="profile-avatar" alt="perthwanderer avatar" />
+    <form>
+      <div class="row align-items-center g-3">
+        <!-- Avatar + name -->
+        <div class="col-auto">
+          <!-- view mode -->
+          <img id="avator_image" src="{{ image_url }}"
+              class="profile-avatar" alt="perthwanderer avatar" />
+          <!-- edit mode -->
+          <label id="avatar_label" for="photo-input" class="d-none position-relative d-inline-block rounded-circle overflow-hidden" style="cursor:pointer;">
+              <img src="{{ image_url }}"
+              class="profile-avatar" alt="perthwanderer avatar" />
+              <span class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-dark bg-opacity-50 text-white small avatar-hover-text">
+                Change
+              </span>
+          </label>
+          <input type="file" class="d-none" id="photo-input" name="avatar_image" multiple accept="image/*"/>
+        </div>
+        <div class="col">
+          <!-- view mode -->
+          <h1 id="username_view" class="h3 fw-bold mb-0">{{ user.username }}</h1>
+          <!-- edit mode -->
+          <input id="username_edit" class="d-none" type="text" value="{{ user.username }}" placeholder="Please enter a user name" required/>
+          <p class="mb-1 opacity-75 small">
+            <i class="bi bi-geo-alt me-1"></i>Perth, WA
+            <span class="mx-2">|</span>
+            <i class="bi bi-calendar3 me-1"></i>Joined {{ user.created_at.strftime("%Y-%m-%d") }}
+          </p>
+          <!-- view mode -->
+          <p id="bio_view" class="mb-0 small" style="max-width:480px;">
+            {% if user.bio == None %}
+              You currently have no biograph, please created one!
+            {% else %}
+              {{ user.bio }}
+            {% endif %}
+          </p>
+          <!-- edit mode -->
+          <textarea id="bio_edit" class="d-none form-control" style="max-width:480px; resize: none;" required></textarea>
+        </div>
+        <!-- Edit profile button (own profile) -->
+        <div class="col-auto">
+          <!-- view mode -->
+          <a id="edit_button" href="#" class="btn btn-light btn-sm">
+            <i class="bi bi-pencil me-1"></i>Edit Profile
+          </a>
+          <!-- edit mode -->
+          <input type="submit" id="save_button" value="💾 Save Edit" class="d-none btn btn-light btn-sm"/>
+        </div>
       </div>
-      <div class="col">
-        <h1 class="h3 fw-bold mb-0">{{ user.username }}</h1>
-        <p class="mb-1 opacity-75 small">
-          <i class="bi bi-geo-alt me-1"></i>Perth, WA
-          <span class="mx-2">|</span>
-          <i class="bi bi-calendar3 me-1"></i>Joined {{ user.created_at.strftime("%Y-%m-%d") }}
-        </p>
-        <p class="mb-0 small" style="max-width:480px;">
-          {% if user.bio == None %}
-            You currently have no biograph, please created one!
-          {% else %}
-            {{ user.bio }}
-          {% endif %}
-        </p>
-      </div>
-      <!-- Edit profile button (own profile) -->
-      <div class="col-auto">
-        <a href="#" class="btn btn-light btn-sm">
-          <i class="bi bi-pencil me-1"></i>Edit Profile
-        </a>
-      </div>
-    </div>
+    </form>
 
     <!-- Stats bar -->
     <div class="row mt-4 g-0 text-white">
@@ -160,6 +187,43 @@
 <!--
 <script>loadComponent('navbar-placeholder', 'navbar.html');</script>
 -->
+
+<script>
+  document.getElementById("edit_button").addEventListener("click", function() {
+    avatar_image = document.getElementById("avator_image");
+    avatar_input = document.getElementById("avatar_label");
+    username_view = document.getElementById("username_view");
+    username_edit = document.getElementById("username_edit");
+    bio_view = document.getElementById("bio_view");
+    bio_edit = document.getElementById("bio_edit");
+    save_button = document.getElementById("save_button")
+
+    avatar_image.classList.add("d-none");
+    avatar_input.classList.remove("d-none");
+    username_view.classList.add("d-none");
+    username_edit.classList.remove("d-none");
+    bio_view.classList.add("d-none");
+    bio_edit.classList.remove("d-none");
+    
+    this.classList.add("d-none");
+    save_button.classList.remove("d-none");
+    
+    return;
+  })
+
+  document.getElementById("save_button").addEventListener("submit", function(e) {
+    // e.preventDefault();
+    const inputs = this.querySelectorAll('[required]');
+    inputs.forEach((input) => {
+      if (input.value === '') {
+        alert(`${input.name} is required`);
+        return;
+      }
+    })
+
+    this.submit()
+  })
+</script>
 
 {% with messages = get_flashed_messages(with_categories = True) %}
   {% if messages %}
