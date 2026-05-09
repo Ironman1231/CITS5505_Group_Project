@@ -368,6 +368,7 @@ def new_checkin():
 def profile_alias():
     return redirect(url_for("profile"))
 @app.route("/profile.html")
+@login_required
 def profile():
     """Render the user profile page prototype"""
     user_id = current_user.id
@@ -395,6 +396,14 @@ def profile():
             check_ins = check_ins,
             avg_rating = round(avg_rating, 1),
             favourite_check_ins = favourite_check_ins)
+
+@app.route("/profile.html", methods = ["POST"])
+@login_required
+def update_profile():
+    username = request.form.get("new_username")
+    bio = request.form.get("new_bio")
+
+    return 1111
 
 
 # Original prototype-only login route:

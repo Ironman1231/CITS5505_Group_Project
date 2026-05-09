@@ -27,7 +27,7 @@
 <!-- ===================== PROFILE HEADER ===================== -->
 <div class="profile-header">
   <div class="container">
-    <form>
+    <form action="{{ url_for('update_profile') }}" method="post" enctype="multipart/form-data">
       <div class="row align-items-center g-3">
         <!-- Avatar + name -->
         <div class="col-auto">
@@ -35,20 +35,21 @@
           <img id="avator_image" src="{{ image_url }}"
               class="profile-avatar" alt="perthwanderer avatar" />
           <!-- edit mode -->
-          <label id="avatar_label" for="photo-input" class="d-none position-relative d-inline-block rounded-circle overflow-hidden" style="cursor:pointer;">
-              <img src="{{ image_url }}"
+          <label id="avatar_label" for="photo_input" class="d-none position-relative d-inline-block rounded-circle overflow-hidden" style="cursor:pointer;">
+              <img id="new_avator_image" src="{{ image_url }}"
               class="profile-avatar" alt="perthwanderer avatar" />
               <span class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-dark bg-opacity-50 text-white small avatar-hover-text">
                 Change
               </span>
           </label>
-          <input type="file" class="d-none" id="photo-input" name="avatar_image" multiple accept="image/*"/>
+          <input id="photo_input" type="file" class="d-none" name="avatar_image" multiple accept="image/*"/>
+          <input id="record_change" class="d-none" name="is_changed" value="False">
         </div>
         <div class="col">
           <!-- view mode -->
           <h1 id="username_view" class="h3 fw-bold mb-0">{{ user.username }}</h1>
           <!-- edit mode -->
-          <input id="username_edit" class="d-none" type="text" value="{{ user.username }}" placeholder="Please enter a user name" required/>
+          <input id="username_edit" class="d-none" type="text" name="new_username" value="{{ user.username }}" placeholder="Please enter a user name" required/>
           <p class="mb-1 opacity-75 small">
             <i class="bi bi-geo-alt me-1"></i>Perth, WA
             <span class="mx-2">|</span>
@@ -63,7 +64,7 @@
             {% endif %}
           </p>
           <!-- edit mode -->
-          <textarea id="bio_edit" class="d-none form-control" style="max-width:480px; resize: none;" required></textarea>
+          <textarea id="bio_edit" class="d-none form-control" name="new_bio" style="max-width:480px; resize: none;" required></textarea>
         </div>
         <!-- Edit profile button (own profile) -->
         <div class="col-auto">
@@ -207,12 +208,28 @@
     
     this.classList.add("d-none");
     save_button.classList.remove("d-none");
+
+    bio_edit.innerTEXT = bio_view.innerTEXT.trim();
     
     return;
   })
 
+  // avatar upload
+  document.getElementById("photo_input").addEventListener("change", function() {
+    const preview = document.getElementById("new_avator_image");
+    record_change = document.getElementById("record_change")
+
+    const file = this.files[0];
+    if (file) {
+      preview.src = URL.createObjectURL(file);
+      record_change.value = "True";
+    }
+
+    return;
+  })
+
   document.getElementById("save_button").addEventListener("submit", function(e) {
-    // e.preventDefault();
+    e.preventDefault();
     const inputs = this.querySelectorAll('[required]');
     inputs.forEach((input) => {
       if (input.value === '') {
@@ -220,7 +237,7 @@
         return;
       }
     })
-
+    
     this.submit()
   })
 </script>
