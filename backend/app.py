@@ -14,6 +14,12 @@ from .extensions import csrf, db, login_manager, migrate
 from . import models  # noqa: F401
 from .models import CheckIn, Comment, Photo, User
 
+# import cloudflare R2
+import boto3
+from dotenv import load_dotenv
+
+from werkzeug.utils import secure_filename
+import uuid
 
 EXPLORE_CATEGORIES = {
     "food": "Food & Drink",
@@ -27,6 +33,7 @@ EXPLORE_SORT_OPTIONS = {
     "newest": "Newest First",
     "rating": "Highest Rated",
 }
+CATETORIES = ["food", "study", "nature", "nightlife", "shopping", "other"]
 
 
 def escape_like_search(value):
@@ -60,6 +67,42 @@ login_manager.login_view = "login"
 login_manager.login_message = "Please log in to access this page."
 login_manager.login_message_category = "warning"
 csrf.init_app(app)
+
+# set up cloudflare s3
+s3 = boto3.client(
+    's3',
+    endpoint_url=f"https://{os.getenv("CLOUDFLARE_ACCOUNT_ID")}.r2.cloudflarestorage.com",
+    aws_access_key_id=os.getenv('CLOUDFLARE_ACCESS_KEY_ID'),
+    aws_secret_access_key=os.getenv("CLOUDFLARE_SECRET_ACCESS_KEY"),
+    region_name="auto"
+)
+
+# upload image to cloudflare R2
+def upload_image(file, filename):
+    """Upload an image to R2 and return the public URL"""
+    bucket = os.getenv("CLOUDFLARE_BUCKET_NAME")
+
+    s3.upload_fileobj(
+        file,
+        bucket,
+        filename,
+        ExtraArgs={"ContentType": file.content_type}
+    )
+
+    # return the public URL
+    public_url = os.getenv("CLOUDFLARE_PUBLIC_URL")
+    return f"{public_url}/{filename}"
+
+# test: upload a test file
+try:
+    s3.put_object(
+        Bucket=os.getenv('CLOUDFLARE_BUCKET_NAME'),
+        Key='test.txt',
+        Body=b'hello world'
+    )
+    print("Upload successful!")
+except Exception as e:
+    print("Upload failed:", e)
 
 
 @login_manager.user_loader
@@ -232,10 +275,41 @@ def new_checkin():
     if request.method == "POST":
         # get information from the front end by id
         title = request.form.get("title")
+        if not title:
+            flash('Title is required')
+            print('Title is required')
+            return redirect(url_for('new_checkin'))
+        
         category = request.form.get("category")
+        if category not in CATETORIES:
+            flash("Category is wrong")
+            print("Category is wrong")
+            return redirect(url_for('new_checkin'))
+
         description = request.form.get("description")
-        lat = float(request.form.get("lat"))
-        lng = float(request.form.get("lng"))
+        if not description:
+            flash('Description is required')
+            print('Description is required')
+            return redirect(url_for('new_checkin'))
+        
+        try:
+            rating = float(request.form.get("rating"))
+            if rating < 1 or rating > 5:
+                raise Exception("Bad rating")
+        except:
+            flash('Invalid rating')
+            print('Invalid rating')
+            return redirect(url_for('new_checkin'))
+        
+        try:
+            lat = float(request.form.get("lat"))
+            lng = float(request.form.get("lng"))
+        except:
+            flash('Invalid location')
+            print('Invalid location')
+            return redirect(url_for('new_checkin'))
+
+
 
         # for all data into a dictionary
         form_data = {
@@ -243,6 +317,7 @@ def new_checkin():
             "title": title,
             "description": description,
             "category": category,
+            "rating": rating,
             "lat": lat,
             "lng": lng
         }
@@ -257,13 +332,30 @@ def new_checkin():
             title = form_data["title"],
             description = form_data["description"],
             category = form_data["category"],
+            rating = form_data["rating"],
             lat = form_data["lat"],
             lng = form_data["lng"]
         )
 
         db.session.add(check_in)
-        db.session.commit()
+        # db.session.commit()
+        db.session.flush()
 
+        # image test
+        image = request.files.get("input_image")
+        if image:
+            # generate unqiue filename to avoid conflicts
+            ext = image.filename.rsplit('.', 1)[1].lower()
+            filename = f"{uuid.uuid4()}.{ext}"
+            image_url = upload_image(image, filename)
+            
+            new_photo = Photo(
+                checkin_id = check_in.id,
+                url = image_url
+            )
+            db.session.add(new_photo)
+        
+        db.session.commit()
         return redirect(url_for("index"))
         
 
@@ -272,11 +364,18 @@ def new_checkin():
 
 
 @app.route("/profile")
+@login_required
 def profile_alias():
     return redirect(url_for("profile"))
 @app.route("/profile.html")
 def profile():
     """Render the user profile page prototype"""
+    user_id = current_user.id
+    user = User.query.filter(User.id == user_id)
+    # if not user:
+
+
+
     return render_template("profile.html")
 
 

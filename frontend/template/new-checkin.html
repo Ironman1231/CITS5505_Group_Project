@@ -36,10 +36,9 @@
     <!-- ===== FORM COLUMN ===== -->
     <div class="col-lg-7">
       <div class="bg-white rounded-3 shadow-sm p-4">
-        <form id="checkin-form" method="POST" action="{{ url_for('new_checkin') }}" novalidate>
+        <!-- enctype="multipart/form-data" is needed. Without enctype="multipart/form-data", Flask will receive an empty request.files and the image won't be uploaded. -->
+        <form id="checkin-form" method="POST" enctype="multipart/form-data">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-          <!-- Hidden rating input -->
-          <input type="hidden" name="rating" id="rating-value" value="0" />
 
           <!-- 1. Place name / location -->
           <div class="mb-4">
@@ -66,8 +65,8 @@
             <div id="map-coords" class="form-text mt-1">No location selected yet.</div>
 
             <!-- The hidden input from leaflet map, which backend can directly get the latitude and longitude the user choose. -->
-            <input type="hidden" id="lat_input" name="lat">
-            <input type="hidden" id="lng_input" name="lng">
+            <input type="hidden" id="lat_input" name="lat" value="">
+            <input type="hidden" id="lng_input" name="lng" value="">
           </div>
 
           <!-- 2. Photos -->
@@ -80,7 +79,7 @@
               <div class="mt-2 text-muted">Click to upload photos</div>
               <div class="text-muted small">PNG, JPG up to 5 MB each</div>
             </label>
-            <input type="file" class="d-none" id="photo-input" multiple accept="image/*" />
+            <input type="file" class="d-none" id="photo-input" name="input_image" multiple accept="image/*"/>
             <div id="photo-previews" class="mt-2 d-flex flex-wrap"></div>
           </div>
 
@@ -123,6 +122,8 @@
             </div>
             <div class="form-text">Click a star to rate (1 = poor, 5 = excellent)</div>
           </div>
+          <!-- Hidden rating input -->
+          <input type="hidden" name="rating" id="rating-value" value="0" />
 
           <!-- 6. Description -->
           <div class="mb-4">
@@ -233,6 +234,17 @@
     }
   });
 
+  // photo upload
+  document.getElementById("photo-input").addEventListener("change", function() {
+    const previews = document.getElementById("preview-img");
+    previews.innerHTML = ''; // clear old previews
+
+    const file = this.files[0];
+    if (file) {
+      previews.src = URL.createObjectURL(file);
+    }
+  })
+
   /* ---- Live preview: title ---- */
   document.getElementById('title').addEventListener('input', function () {
     const val = this.value.trim();
@@ -305,21 +317,50 @@
   });
 
   /* ---- Form submit feedback ---- */
-  // document.getElementById('checkin-form').addEventListener('submit', function (e) {
-  //   e.preventDefault();
-  //   if (!this.checkValidity()) {
-  //     this.classList.add('was-validated');
-  //     return;
-  //   }
-  //   // Simulate success
-  //   alert('Check-in published! (Demo — redirecting to home)');
-  //   window.location.href = 'index.html';
-  // });
+  document.getElementById('checkin-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    const inputs = this.querySelectorAll('[required]');
+    inputs.forEach(input => {
+        if (input.value === '') {
+            alert(`${input.name} is required`);
+            return;
+        }
+    });
+
+    const lat = document.getElementById('lat_input').value;
+    const lng = document.getElementById('lng_input').value;
+    if (lat == '' || lng == '') {
+      alert('Please select a location on the map');
+      return;
+    }
+
+    const photo = document.getElementById("photo-input");
+    if (!photo.files || photo.files.length === 0) {
+      alert("Please upload a photo");
+      return;
+    }
+
+    const rate = document.getElementById("rating-value").value;
+    if (rate === "0") {
+      alert("Please set a rate");
+      return;
+    }
+
+    this.submit();
+  });
 
   {% if login_status == False %}
     const modal = new bootstrap.Modal(document.getElementById("login_modal"));
     modal.show()
   {% endif %}
+
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      {% for message in messages %}
+        alert("{{ message }}");
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
 </script>
 
 </body>
