@@ -37,7 +37,7 @@
     <div class="col-lg-7">
       <div class="bg-white rounded-3 shadow-sm p-4">
         <!-- enctype="multipart/form-data" is needed. Without enctype="multipart/form-data", Flask will receive an empty request.files and the image won't be uploaded. -->
-        <form id="checkin-form" method="POST" enctype="multipart/form-data">
+        <form id="checkin-form" method="POST" action="{{ url_for('new_checkin') }}" enctype="multipart/form-data">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
 
           <!-- 1. Place name / location -->
