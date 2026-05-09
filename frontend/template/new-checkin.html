@@ -353,6 +353,14 @@
     const modal = new bootstrap.Modal(document.getElementById("login_modal"));
     modal.show()
   {% endif %}
+
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      {% for message in messages %}
+        alert("{{ message }}");
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
 </script>
 
 </body>

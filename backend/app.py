@@ -294,6 +294,8 @@ def new_checkin():
         
         try:
             rating = float(request.form.get("rating"))
+            if rating < 1 or rating > 5:
+                raise Exception("Bad rating")
         except:
             flash('Invalid rating')
             print('Invalid rating')
@@ -362,11 +364,18 @@ def new_checkin():
 
 
 @app.route("/profile")
+@login_required
 def profile_alias():
     return redirect(url_for("profile"))
 @app.route("/profile.html")
 def profile():
     """Render the user profile page prototype"""
+    user_id = current_user.id
+    user = User.query.filter(User.id == user_id)
+    # if not user:
+
+
+
     return render_template("profile.html")
 
 
