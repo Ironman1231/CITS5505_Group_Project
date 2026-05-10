@@ -276,8 +276,8 @@ def new_checkin():
         # get information from the front end by id
         title = request.form.get("title")
         if not title:
-            flash('Title is required')
-            print('Title is required')
+            flash("Title is required")
+            print("Title is required")
             return redirect(url_for('new_checkin'))
         
         category = request.form.get("category")
@@ -288,8 +288,8 @@ def new_checkin():
 
         description = request.form.get("description")
         if not description:
-            flash('Description is required')
-            print('Description is required')
+            flash("Description is required")
+            print("Description is required")
             return redirect(url_for('new_checkin'))
         
         try:
@@ -297,16 +297,16 @@ def new_checkin():
             if rating < 1 or rating > 5:
                 raise Exception("Bad rating")
         except:
-            flash('Invalid rating')
-            print('Invalid rating')
+            flash("Invalid rating")
+            print("Invalid rating")
             return redirect(url_for('new_checkin'))
         
         try:
             lat = float(request.form.get("lat"))
             lng = float(request.form.get("lng"))
         except:
-            flash('Invalid location')
-            print('Invalid location')
+            flash("Invalid location")
+            print("Invalid location")
             return redirect(url_for('new_checkin'))
 
 
@@ -371,12 +371,30 @@ def profile_alias():
 def profile():
     """Render the user profile page prototype"""
     user_id = current_user.id
-    user = User.query.filter(User.id == user_id)
-    # if not user:
+    user = User.query.filter(User.id == user_id).first()
 
-
-
-    return render_template("profile.html")
+    if not user:
+        flash("Please login first", "baduser")
+        return render_template("profile.html")
+    else:
+        check_ins = CheckIn.query.filter(CheckIn.user_id == user.id).all()
+        favourites = user.favourites.all()
+        # find out the favourite checkins
+        favourite_checkin_ids = [f.checkin_id for f in favourites]
+        # following is the code to check which checkin ids are in the favourite_checkin_ids
+        favourite_check_ins = CheckIn.query.filter(CheckIn.id.in_(favourite_checkin_ids)).all()
+        sum_rating = 0
+        avg_rating = 0
+        if len(check_ins) != 0:
+            for check_in in check_ins:
+                sum_rating += check_in.rating
+            avg_rating = sum_rating / len(check_ins)
+        return render_template(
+            "profile.html",
+            user = user,
+            check_ins = check_ins,
+            avg_rating = round(avg_rating, 1),
+            favourite_check_ins = favourite_check_ins)
 
 
 # Original prototype-only login route:
