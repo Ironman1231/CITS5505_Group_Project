@@ -211,7 +211,12 @@
     this.classList.add("d-none");
     save_button.classList.remove("d-none");
 
-    bio_edit.value = bio_view.innerText.trim();
+    if (bio_view.innerText.trim() === "You currently have no biograph, please created one!") {
+      bio_edit.placeholder = bio_view.innerText.trim();
+    }
+    else {
+      bio_edit.value = bio_view.innerText.trim();
+    }
     
     return;
   })
