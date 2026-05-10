@@ -319,37 +319,34 @@
   });
 
   /* ---- Form submit feedback ---- */
-  document.getElementById('checkin-form').addEventListener('submit', function (e) {
-    e.preventDefault();
-    const inputs = this.querySelectorAll('[required]');
-    inputs.forEach(input => {
-        if (input.value === '') {
-            alert(`${input.name} is required`);
-            return;
-        }
-    });
-
-    const lat = document.getElementById('lat_input').value;
-    const lng = document.getElementById('lng_input').value;
-    if (lat == '' || lng == '') {
-      alert('Please select a location on the map');
-      return;
+document.getElementById('checkin-form').addEventListener('submit', function (e) {
+  e.preventDefault();
+  const inputs = this.querySelectorAll('[required]');
+  for (const input of inputs) {
+    if (input.value.trim() === '') {
+      alert(`${input.name || input.id} is required`);
+      input.focus();
+      return; // ← now correctly exits the entire handler
     }
-
-    const photo = document.getElementById("photo-input");
-    if (!photo.files || photo.files.length === 0) {
-      alert("Please upload a photo");
-      return;
-    }
-
-    const rate = document.getElementById("rating-value").value;
-    if (rate === "0") {
-      alert("Please set a rate");
-      return;
-    }
-
-    this.submit();
-  });
+  }
+  const lat = document.getElementById('lat_input').value;
+  const lng = document.getElementById('lng_input').value;
+  if (lat === '' || lng === '') {
+    alert('Please select a location on the map');
+    return;
+  }
+  const photo = document.getElementById('photo-input');
+  if (!photo.files || photo.files.length === 0) {
+    alert('Please upload a photo');
+    return;
+  }
+  const rate = document.getElementById('rating-value').value;
+  if (rate === '0') {
+    alert('Please set a rating');
+    return;
+  }
+  this.submit();
+});
 
   // {% if login_status == False %}
   //   const modal = new bootstrap.Modal(document.getElementById("login_modal"));
