@@ -11,6 +11,7 @@
 {% set description = check_in.description or "No description provided yet." %}
 {% set photo = check_in.photos.first() %}
 {% set author_name = check_in.author.username if check_in.author else "Unknown author" %}
+{% set is_card_favourited = check_in.id in (favourited_checkin_ids | default([])) %}
 
 <div class="col-sm-6 col-lg-4 col-xl-3">
   <div class="card checkin-card h-100">
@@ -45,9 +46,25 @@
             <span class="author-prefix">by</span> {{ author_name }}
           </span>
         </div>
-        <button class="btn btn-sm btn-outline-secondary btn-fav" aria-label="Add to favourites">
-          Favourite
-        </button>
+        {% if current_user.is_authenticated %}
+          <form method="POST"
+                action="{{ url_for('toggle_favourite', checkin_id=check_in.id) }}"
+                class="d-inline">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            <input type="hidden" name="next" value="{{ request.full_path if request.query_string else request.path }}" />
+            <button type="submit"
+                    class="btn btn-sm {% if is_card_favourited %}btn-danger{% else %}btn-outline-secondary{% endif %} btn-fav"
+                    aria-label="{% if is_card_favourited %}Remove from favourites{% else %}Add to favourites{% endif %}">
+              {% if is_card_favourited %}Unfavourite{% else %}Favourite{% endif %}
+            </button>
+          </form>
+        {% else %}
+          <a href="{{ url_for('login') }}"
+             class="btn btn-sm btn-outline-secondary btn-fav"
+             aria-label="Log in to add this check-in to favourites">
+            Favourite
+          </a>
+        {% endif %}
       </div>
     </div>
     <div class="card-footer bg-transparent border-0 pt-0">
