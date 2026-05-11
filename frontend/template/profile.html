@@ -139,7 +139,8 @@
       <div class="row g-4">
 
         {% for check_in in check_ins %}
-          <form class="col-sm-6 col-lg-4 col-xl-3">
+          <form class="col-sm-6 col-lg-4 col-xl-3" method="post" action="{{ url_for('delete_checkin', checkin_id = check_in.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
             {% include "_checkin_card.html" %}
           </form>
         {% else %}

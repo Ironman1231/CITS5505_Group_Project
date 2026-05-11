@@ -429,6 +429,15 @@ def update_profile():
 
     return redirect(url_for("profile"))
 
+@app.route("/delete_checkin/<int:checkin_id>", methods=["POST"])
+@login_required
+def delete_checkin(checkin_id):
+    checkin = CheckIn.query.filter(CheckIn.id == checkin_id).first()
+    db.session.delete(checkin)
+    db.session.commit()
+
+    return redirect(url_for("profile"))
+
 
 # Original prototype-only login route:
 # @app.route("/login")
