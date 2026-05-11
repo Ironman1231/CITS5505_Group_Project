@@ -114,6 +114,7 @@ def load_user(user_id):
         return None
 
 
+# this seems doesn't work
 @app.errorhandler(CSRFError)
 def handle_csrf_error(error):
     """Show a friendly message when a submitted form is missing/has bad CSRF."""
@@ -368,11 +369,12 @@ def new_checkin():
 def profile_alias():
     return redirect(url_for("profile"))
 @app.route("/profile.html")
+@login_required
 def profile():
     """Render the user profile page prototype"""
     user_id = current_user.id
     user = User.query.filter(User.id == user_id).first()
-
+    
     if not user:
         flash("Please login first", "baduser")
         return render_template("profile.html")
@@ -395,6 +397,36 @@ def profile():
             check_ins = check_ins,
             avg_rating = round(avg_rating, 1),
             favourite_check_ins = favourite_check_ins)
+
+@app.route("/update_profile", methods = ["POST"])
+@login_required
+def update_profile():
+    username = request.form.get("new_username")
+    bio = request.form.get("new_bio")
+    is_changed = request.form.get("is_changed")
+    img_url = None
+
+    if is_changed == "True":
+        img = request.files.get("avatar_image")
+        # convert image to url
+        ext = img.filename.rsplit('.', 1)[1].lower()
+        filename = f"{uuid.uuid4()}.{ext}"
+        img_url = upload_image(img, filename)
+    
+    user_id = current_user.id
+    user = User.query.filter(User.id == user_id).first()
+
+    if not user:
+        flash("Please login first", "baduser")
+        return render_template("profile.html")
+    else:
+        user.username = username
+        user.bio = bio
+        if is_changed == "True":
+            user.avatar_url = img_url
+        db.session.commit()
+
+    return redirect(url_for("profile"))
 
 
 # Original prototype-only login route:
