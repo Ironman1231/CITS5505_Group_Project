@@ -396,7 +396,8 @@ def profile():
             user = user,
             check_ins = check_ins,
             avg_rating = round(avg_rating, 1),
-            favourite_check_ins = favourite_check_ins)
+            favourite_check_ins = favourite_check_ins,
+            is_profile = True)
 
 @app.route("/update_profile", methods = ["POST"])
 @login_required

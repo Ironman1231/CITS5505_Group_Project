@@ -139,7 +139,9 @@
       <div class="row g-4">
 
         {% for check_in in check_ins %}
-          {% include "_checkin_card.html" %}
+          <form class="col-sm-6 col-lg-4 col-xl-3">
+            {% include "_checkin_card.html" %}
+          </form>
         {% else %}
           <div class="col-12">
             <div class="bg-white border rounded-3 shadow-sm text-center p-5">
@@ -165,7 +167,9 @@
     <div class="tab-pane fade" id="saved" role="tabpanel">
       <div class="row g-4">
         {% for check_in in favourite_check_ins %}
-          {% include "_checkin_card.html" %}
+          <div class="col-sm-6 col-lg-4 col-xl-3">
+            {% include "_checkin_card.html" %}
+          </div>
         {% else %}
           <div class="col-12">
             <div class="bg-white border rounded-3 shadow-sm text-center p-5">
@@ -246,6 +250,20 @@
       }
     })
     this.submit()
+  })
+
+  document.getElementById("mycheckins-tab").addEventListener("click", () => {
+    delete_btn = document.querySelectorAll(".btn_delete");
+    delete_btn.forEach((btn) => {
+      btn.classList.remove("d-none");
+    })
+  })
+
+  document.getElementById("saved-tab").addEventListener("click", () => {
+    delete_btn = document.querySelectorAll(".btn_delete");
+    delete_btn.forEach((btn) => {
+      btn.classList.add("d-none");
+    })
   })
 </script>
 
