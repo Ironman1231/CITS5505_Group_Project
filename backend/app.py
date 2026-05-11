@@ -343,18 +343,19 @@ def new_checkin():
         db.session.flush()
 
         # image test
-        image = request.files.get("input_image")
-        if image:
-            # generate unqiue filename to avoid conflicts
-            ext = image.filename.rsplit('.', 1)[1].lower()
-            filename = f"{uuid.uuid4()}.{ext}"
-            image_url = upload_image(image, filename)
-            
-            new_photo = Photo(
-                checkin_id = check_in.id,
-                url = image_url
-            )
-            db.session.add(new_photo)
+        images = request.files.getlist("input_image")
+        for image in images:
+            if image and image.filename != '':
+                # generate unqiue filename to avoid conflicts
+                ext = image.filename.rsplit('.', 1)[1].lower()
+                filename = f"{uuid.uuid4()}.{ext}"
+                image_url = upload_image(image, filename)
+                
+                new_photo = Photo(
+                    checkin_id = check_in.id,
+                    url = image_url
+                )
+                db.session.add(new_photo)
         
         db.session.commit()
         return redirect(url_for("index"))
