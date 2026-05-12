@@ -348,9 +348,10 @@ document.getElementById('pick-on-map').addEventListener('click', function () {
 });
 
 // update preview image and revoke previous object URL to free memory
-document.getElementById('photo-input').addEventListener('change', function () {
-  const previewImg = document.getElementById('preview-img');
+document.getElementById("photo-input").addEventListener("change", function () {
+  const previewImg = document.getElementById("preview-img");
 
+  // Release any previously created object URL to avoid memory leaks
   if (previewImg.dataset.objectUrl) {
     URL.revokeObjectURL(previewImg.dataset.objectUrl);
     previewImg.dataset.objectUrl = '';
@@ -358,11 +359,13 @@ document.getElementById('photo-input').addEventListener('change', function () {
 
   const file = this.files[0];
   if (file) {
+    // Create a temporary local URL for the selected image file
     const objectUrl = URL.createObjectURL(file);
     previewImg.src = objectUrl;
+    // Store URL reference so we can revoke it on next change
     previewImg.dataset.objectUrl = objectUrl;
   } else {
-    // reset to placeholder if file cleared
+    // User cleared the file input — reset preview to placeholder
     previewImg.src = 'https://picsum.photos/400/220?random=61';
   }
 });
