@@ -41,6 +41,24 @@ def escape_like_search(value):
     return value.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
 
 
+def get_current_user_favourite_ids():
+    """Return check-in IDs favourited by the logged-in user."""
+    if not current_user.is_authenticated:
+        return set()
+    return {
+        favourite.checkin_id
+        for favourite in models.Favourite.query.filter_by(user_id=current_user.id).all()
+    }
+
+
+def get_safe_redirect_target(default_endpoint, **default_values):
+    """Use a local POST return path when available, otherwise fall back safely."""
+    target = request.form.get("next", "").strip()
+    if target.startswith("/") and not target.startswith("//"):
+        return target
+    return url_for(default_endpoint, **default_values)
+
+
 # Configure Flask to reuse the existing prototype templates and static files
 app = Flask(
     __name__,
@@ -130,7 +148,12 @@ def index():
         {"lat": c.lat, "lng": c.lng, "title": c.title, "category": c.category}
         for c in check_ins if c.lat is not None and c.lng is not None
     ]
-    return render_template("index.html", check_ins=check_ins, markers=markers)
+    return render_template(
+        "index.html",
+        check_ins=check_ins,
+        markers=markers,
+        favourited_checkin_ids=get_current_user_favourite_ids(),
+    )
 
 @app.route("/explore")    
 def explore_alias():
@@ -177,6 +200,7 @@ def explore():
         filters=filters,
         category_options=EXPLORE_CATEGORIES,
         sort_options=EXPLORE_SORT_OPTIONS,
+        favourited_checkin_ids=get_current_user_favourite_ids(),
     )
 
 
@@ -270,7 +294,7 @@ def toggle_favourite(checkin_id):
         ))
         db.session.commit()
         flash("Added to favourites!", "success")
-    return redirect(url_for("checkin_detail", checkin_id=checkin_id))
+    return redirect(get_safe_redirect_target("checkin_detail", checkin_id=checkin_id))
 
 
 @app.route("/new-checkin")
@@ -403,7 +427,8 @@ def profile():
             user = user,
             check_ins = check_ins,
             avg_rating = round(avg_rating, 1),
-            favourite_check_ins = favourite_check_ins)
+            favourite_check_ins = favourite_check_ins,
+            favourited_checkin_ids=set(favourite_checkin_ids))
 
 @app.route("/update_profile", methods = ["POST"])
 @login_required
@@ -568,6 +593,7 @@ def search():
         filters={"category": "", "min_rating": "", "sort": "newest"},
         category_options=EXPLORE_CATEGORIES,
         sort_options=EXPLORE_SORT_OPTIONS,
+        favourited_checkin_ids=get_current_user_favourite_ids(),
     )
 @app.route("/navbar.html")
 def navbar():
