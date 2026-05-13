@@ -200,6 +200,12 @@ def checkin_detail(checkin_id):
     comments = check_in.comments.order_by(Comment.created_at.desc()).all()
     comments_count = len(comments)
     favourites_count = check_in.favourites.count()
+    is_favourited = False
+    if current_user.is_authenticated:
+        is_favourited = models.Favourite.query.filter_by(
+            user_id=current_user.id,
+            checkin_id=check_in.id,
+        ).first() is not None
     category = check_in.category if check_in.category in EXPLORE_CATEGORIES else "other"
     detail_map = {
         "lat": check_in.lat,
@@ -214,6 +220,7 @@ def checkin_detail(checkin_id):
         comments=comments,
         comments_count=comments_count,
         favourites_count=favourites_count,
+        is_favourited=is_favourited,
         category_key=category,
         category_label=EXPLORE_CATEGORIES.get(category, category.title()),
         detail_map=detail_map,
