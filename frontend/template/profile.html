@@ -247,6 +247,20 @@
     })
     this.submit()
   })
+
+  document.getElementById("mycheckins-tab").addEventListener("click", () => {
+    delete_btn = document.querySelectorAll(".btn_delete");
+    delete_btn.forEach((btn) => {
+      btn.classList.remove("d-none");
+    })
+  })
+
+  document.getElementById("saved-tab").addEventListener("click", () => {
+    delete_btn = document.querySelectorAll(".btn_delete");
+    delete_btn.forEach((btn) => {
+      btn.classList.add("d-none");
+    })
+  })
 </script>
 
 {% with messages = get_flashed_messages(with_categories = True) %}

@@ -3,51 +3,21 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Share a new place discovery around Perth or UWA." />
   <title>New Check-in — PerthPins</title>
 
-  <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
-
-  <!-- Bootstrap Icons -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
-
-  <!-- Leaflet CSS with SRI hash -->
-  <link rel="stylesheet"
-        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-        crossorigin="anonymous" />
-
-  <!-- Site-wide styles -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <link rel="stylesheet" href="../static/css/common.css" />
-
-  <!-- Page-specific styles -->
   <link rel="stylesheet" href="../static/css/new-checkin.css" />
 </head>
 <body>
 
+<!--
+<div id="navbar-placeholder"></div>
+-->
 {% include "navbar.html" %}
 
-<!-- Flash messages rendered as Bootstrap alerts, not alert() -->
-{% with messages = get_flashed_messages(with_categories=true) %}
-  {% if messages %}
-    <div class="container mt-3">
-      {% for category, message in messages %}
-        <div class="alert alert-{{ category }} alert-dismissible fade show py-2" role="alert">
-          {% if category == 'success' %}
-            <i class="bi bi-check-circle-fill me-2"></i>
-          {% elif category == 'danger' %}
-            <i class="bi bi-exclamation-triangle-fill me-2"></i>
-          {% else %}
-            <i class="bi bi-info-circle-fill me-2"></i>
-          {% endif %}
-          {{ message }}
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-      {% endfor %}
-    </div>
-  {% endif %}
-{% endwith %}
 
 <!-- Page header -->
 <div class="bg-white border-bottom py-4">
@@ -59,61 +29,44 @@
   </div>
 </div>
 
+
 <main class="container py-4">
   <div class="row g-4">
 
     <!-- ===== FORM COLUMN ===== -->
     <div class="col-lg-7">
       <div class="bg-white rounded-3 shadow-sm p-4">
-
-        <!-- enctype="multipart/form-data" required for file uploads -->
-        <form id="checkin-form"
-              method="POST"
-              action="{{ url_for('new_checkin') }}"
-              enctype="multipart/form-data"
-              novalidate>
-
+        <!-- enctype="multipart/form-data" is needed. Without enctype="multipart/form-data", Flask will receive an empty request.files and the image won't be uploaded. -->
+        <form id="checkin-form" method="POST" enctype="multipart/form-data">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
 
-          <!-- 1. Place name -->
+          <!-- 1. Place name / location -->
           <div class="mb-4">
             <label for="place-name" class="form-label fw-semibold">
               <i class="bi bi-geo-alt me-1 text-green"></i>Place Name
             </label>
             <div class="input-group">
-              <input type="text"
-                     class="form-control"
-                     id="place-name"
-                     name="place_name"
-                     placeholder="e.g. Matilda Bay, Kings Park..."
-                     autocomplete="off"
-                     required />
-              <!-- type="button" prevents accidental form submit -->
-              <button class="btn btn-outline-secondary"
-                      type="button"
-                      id="pick-on-map"
-                      aria-expanded="false"
-                      aria-controls="map-picker-wrap">
+              <input type="text" class="form-control" id="place-name"
+                     placeholder="e.g. Matilda Bay, Kings Park..." required />
+              <button class="btn btn-outline-secondary" type="button" id="pick-on-map">
                 <i class="bi bi-map me-1"></i>Pick on Map
               </button>
             </div>
             <div class="form-text">Type a name or click the button to select on the map below.</div>
-            <div class="invalid-feedback">Please enter a place name.</div>
           </div>
 
-          <!-- Map picker — hidden by default, toggled by Pick on Map button -->
+          <!-- Map picker (collapsed by default, toggled by the button) -->
           <div class="mb-4" id="map-picker-wrap" style="display:none;">
             <label class="form-label fw-semibold small">
               <i class="bi bi-cursor me-1 text-green"></i>Select Location on Map
               <span class="text-muted fw-normal">(click the map to drop a pin)</span>
             </label>
-            <!-- Leaflet map container -->
             <div id="map-picker" class="border rounded"></div>
-            <!-- Coordinate feedback label -->
             <div id="map-coords" class="form-text mt-1">No location selected yet.</div>
-            <!-- Hidden lat/lng fields included in POST payload -->
-            <input type="hidden" id="lat_input" name="lat" value="" />
-            <input type="hidden" id="lng_input" name="lng" value="" />
+
+            <!-- The hidden input from leaflet map, which backend can directly get the latitude and longitude the user choose. -->
+            <input type="hidden" id="lat_input" name="lat" value="">
+            <input type="hidden" id="lng_input" name="lng" value="">
           </div>
 
           <!-- 2. Photos -->
@@ -121,18 +74,12 @@
             <label class="form-label fw-semibold">
               <i class="bi bi-camera me-1 text-green"></i>Photos
             </label>
-            <!-- Styled upload zone using label as click target -->
             <label for="photo-input" class="photo-preview-area d-block">
               <i class="bi bi-cloud-upload fs-2 text-muted"></i>
-              <div class="mt-2 text-muted">Click to upload a photo</div>
-              <div class="text-muted small">PNG, JPG up to 5 MB</div>
+              <div class="mt-2 text-muted">Click to upload photos</div>
+              <div class="text-muted small">PNG, JPG up to 5 MB each</div>
             </label>
-            <!-- name="input_image" must match request.files key in Flask -->
-            <input type="file"
-                   class="d-none"
-                   id="photo-input"
-                   name="input_image"
-                   accept="image/*" />
+            <input type="file" class="d-none" id="photo-input" name="input_image" multiple accept="image/*"/>
             <div id="photo-previews" class="mt-2 d-flex flex-wrap"></div>
           </div>
 
@@ -141,14 +88,8 @@
             <label for="title" class="form-label fw-semibold">
               <i class="bi bi-pencil me-1 text-green"></i>Title
             </label>
-            <input type="text"
-                   class="form-control"
-                   id="title"
-                   name="title"
-                   placeholder="Give your check-in a short title..."
-                   maxlength="120"
-                   required />
-            <div class="invalid-feedback">Please enter a title.</div>
+            <input type="text" class="form-control" id="title"
+                   placeholder="Give your check-in a short title..." name="title" required />
           </div>
 
           <!-- 4. Category -->
@@ -165,7 +106,6 @@
               <option value="shopping">Shopping</option>
               <option value="other">Other</option>
             </select>
-            <div class="invalid-feedback">Please choose a category.</div>
           </div>
 
           <!-- 5. Star rating -->
@@ -173,22 +113,16 @@
             <label class="form-label fw-semibold d-block">
               <i class="bi bi-star me-1 text-green"></i>Your Rating
             </label>
-            <div class="star-picker" id="star-picker"
-                 role="radiogroup" aria-label="Rate from 1 to 5 stars">
-              <i class="bi bi-star" data-value="1" role="radio" aria-label="1 star" tabindex="0"></i>
-              <i class="bi bi-star" data-value="2" role="radio" aria-label="2 stars" tabindex="0"></i>
-              <i class="bi bi-star" data-value="3" role="radio" aria-label="3 stars" tabindex="0"></i>
-              <i class="bi bi-star" data-value="4" role="radio" aria-label="4 stars" tabindex="0"></i>
-              <i class="bi bi-star" data-value="5" role="radio" aria-label="5 stars" tabindex="0"></i>
+            <div class="star-picker" id="star-picker">
+              <i class="bi bi-star" data-value="1"></i>
+              <i class="bi bi-star" data-value="2"></i>
+              <i class="bi bi-star" data-value="3"></i>
+              <i class="bi bi-star" data-value="4"></i>
+              <i class="bi bi-star" data-value="5"></i>
             </div>
             <div class="form-text">Click a star to rate (1 = poor, 5 = excellent)</div>
-            <!-- Shown by JS when user tries to submit without rating -->
-            <div class="text-danger small mt-1 d-none" id="rating-error">
-              Please select a star rating.
-            </div>
           </div>
-
-          <!-- Hidden rating value submitted with the form -->
+          <!-- Hidden rating input -->
           <input type="hidden" name="rating" id="rating-value" value="0" />
 
           <!-- 6. Description -->
@@ -196,36 +130,15 @@
             <label for="description" class="form-label fw-semibold">
               <i class="bi bi-card-text me-1 text-green"></i>Description
             </label>
-            <textarea class="form-control"
-                      id="description"
-                      name="description"
-                      rows="5"
-                      maxlength="1000"
-                      placeholder="Tell others what makes this place special — what to expect, best time to visit, tips..."
-                      required></textarea>
-            <div class="invalid-feedback">Please add a description.</div>
-            <!-- Live character counter updated by JS input listener -->
-            <div class="form-text text-end">
-              <span id="desc-char-count">0</span> / 1000 characters
-            </div>
+            <textarea class="form-control" id="description" rows="5"
+                      placeholder="Tell others what makes this place special — what to expect, best time to visit, tips..." name="description" required></textarea>
           </div>
 
-          <!-- Submit row -->
+          <!-- Submit -->
           <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-            <!-- url_for('explore') resolves correctly in all environments -->
-            <a href="{{ url_for('explore') }}" class="btn btn-outline-secondary px-4">
-              <i class="bi bi-x-circle me-1"></i>Cancel
-            </a>
-            <!-- Spinner shown after validation passes to block double-submit -->
-            <button type="submit" class="btn btn-pp px-5" id="submit-btn">
-              <span id="submit-text">
-                <i class="bi bi-send me-1"></i>Publish Check-in
-              </span>
-              <span id="submit-spinner" class="d-none">
-                <span class="spinner-border spinner-border-sm me-1"
-                      role="status" aria-hidden="true"></span>
-                Publishing...
-              </span>
+            <a href="explore.html" class="btn btn-outline-secondary px-4">Cancel</a>
+            <button type="submit" class="btn btn-pp px-5">
+              <i class="bi bi-send me-1"></i>Publish Check-in
             </button>
           </div>
 
@@ -233,59 +146,42 @@
       </div>
     </div><!-- /form column -->
 
+
     <!-- ===== PREVIEW COLUMN ===== -->
     <div class="col-lg-5">
       <div class="position-sticky" style="top:80px;">
 
+        <!-- Preview card -->
         <p class="fw-semibold text-muted small mb-2">
           <i class="bi bi-eye me-1"></i>Live Preview
         </p>
-
-        <!-- Preview card mirrors the real check-in card layout -->
         <div class="card checkin-card">
-          <!-- Updated by photo upload handler -->
-          <img src="https://picsum.photos/400/220?random=61"
-               class="card-img-top"
-               id="preview-img"
-               alt="Preview of uploaded photo" />
+          <img src="https://picsum.photos/400/220?random=61" class="card-img-top" id="preview-img" alt="preview" />
           <div class="card-body">
-            <!-- Updated by category select handler -->
             <span class="badge badge-nature mb-2" id="preview-badge">Nature</span>
-            <!-- Updated by title input handler -->
             <h5 class="card-title" id="preview-title">Your Place Name</h5>
-            <!-- Updated by star picker click handler -->
             <div class="stars mb-1" id="preview-stars">
-              <i class="bi bi-star"></i>
-              <i class="bi bi-star"></i>
-              <i class="bi bi-star"></i>
-              <i class="bi bi-star"></i>
+              <i class="bi bi-star"></i><i class="bi bi-star"></i>
+              <i class="bi bi-star"></i><i class="bi bi-star"></i>
               <i class="bi bi-star"></i>
               <small class="text-muted ms-1" id="preview-rating">-</small>
             </div>
-            <!-- Updated by description textarea handler -->
             <p class="card-text small" id="preview-desc">Your description will appear here...</p>
             <div class="d-flex align-items-center mt-2">
-              <img src="https://picsum.photos/30/30?random=101"
-                   class="rounded-circle me-2"
-                   width="24" height="24"
-                   alt="Your avatar"
-                   style="object-fit:cover;" />
+              <img src="https://picsum.photos/30/30?random=101" class="rounded-circle me-2" width="24" height="24" alt="you" style="object-fit:cover;" />
               <small class="text-muted">You</small>
             </div>
           </div>
         </div>
 
-        <!-- Tips panel -->
+        <!-- Tips -->
         <div class="bg-white rounded-3 shadow-sm p-3 mt-4">
-          <h6 class="fw-bold mb-2 text-green">
-            <i class="bi bi-lightbulb me-1"></i>Tips for a great check-in
-          </h6>
+          <h6 class="fw-bold mb-2 text-green"><i class="bi bi-lightbulb me-1"></i>Tips for a great check-in</h6>
           <ul class="small text-muted mb-0 ps-3">
-            <li class="mb-1">Add at least one clear, well-lit photo</li>
-            <li class="mb-1">Mention the best time to visit</li>
-            <li class="mb-1">Include practical details (parking, opening hours)</li>
-            <li class="mb-1">Be honest with your rating</li>
-            <li>Keep your description under 1 000 characters</li>
+            <li>Add at least one clear photo</li>
+            <li>Mention the best time to visit</li>
+            <li>Include practical details (parking, opening hours)</li>
+            <li>Be honest with your rating</li>
           </ul>
         </div>
 
@@ -295,215 +191,193 @@
   </div><!-- /row -->
 
   {% include "login_popup.html" %}
-
 </main>
 
-<!-- Bootstrap JS bundle -->
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-<!-- Leaflet JS with SRI hash -->
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-        crossorigin="anonymous"></script>
-
-<!-- Shared utilities -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="../static/js/common.js"></script>
+<!--
+<script>loadComponent('navbar-placeholder', 'navbar.html');</script>
+-->
 
 <script>
-'use strict';
+  /* ---- Map picker ---- */
+  let pickerMap = null;
+  let pickerMarker = null;
 
-// map state
-let pickerMap    = null;
-let pickerMarker = null;
+  document.getElementById('pick-on-map').addEventListener('click', function () {
+    const wrap = document.getElementById('map-picker-wrap');
+    wrap.style.display = wrap.style.display === 'none' ? 'block' : 'none';
 
-// toggle map picker panel
-document.getElementById('pick-on-map').addEventListener('click', function () {
-  const wrap      = document.getElementById('map-picker-wrap');
-  const isVisible = wrap.style.display !== 'none';
-  wrap.style.display = isVisible ? 'none' : 'block';
-  this.setAttribute('aria-expanded', String(!isVisible));
+    if (wrap.style.display === 'block' && !pickerMap) {
+      pickerMap = L.map('map-picker').setView([-31.9505, 115.8605], 13);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+      }).addTo(pickerMap);
 
-  if (!isVisible && !pickerMap) {
-    // initialise map centred on Perth CBD
-    pickerMap = L.map('map-picker').setView([-31.9505, 115.8605], 13);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap contributors'
-    }).addTo(pickerMap);
+      pickerMap.on('click', function (e) {
+        const { lat, lng } = e.latlng;
+        if (pickerMarker) pickerMap.removeLayer(pickerMarker);
+        pickerMarker = L.marker([lat, lng]).addTo(pickerMap);
+        document.getElementById('map-coords').textContent = `
+        Selected: ${lat.toFixed(5)}, ${lng.toFixed(5)}
+        `;
+        
+        // Save the value of latitude and longitude to the hidden input
+        document.getElementById("lat_input").value = lat;
+        document.getElementById("lng_input").value = lng;
+          
+      });
+    } else if (pickerMap) {
+      pickerMap.invalidateSize(); // fix tile rendering after show
+    }
+  });
 
-    // drop marker and save coordinates on click
-    pickerMap.on('click', function (e) {
-      const { lat, lng } = e.latlng;
-      if (pickerMarker) pickerMap.removeLayer(pickerMarker);
-      pickerMarker = L.marker([lat, lng]).addTo(pickerMap);
-      document.getElementById('map-coords').textContent =
-        'Selected: ' + lat.toFixed(5) + ', ' + lng.toFixed(5);
-      document.getElementById('lat_input').value = lat;
-      document.getElementById('lng_input').value = lng;
+  // photo upload
+  document.getElementById("photo-input").addEventListener("change", function() {
+    const previews = document.getElementById("preview-img");
+
+    const file = this.files[0];
+    if (file) {
+      previews.src = URL.createObjectURL(file);
+    }
+  })
+
+  /* ---- Live preview: title ---- */
+  document.getElementById('title').addEventListener('input', function () {
+    const val = this.value.trim();
+    document.getElementById('preview-title').textContent = val || 'Your Place Name';
+  });
+
+  /* ---- Live preview: description ---- */
+  document.getElementById('description').addEventListener('input', function () {
+    const val = this.value.trim();
+    const short = val.length > 100 ? val.substring(0, 100) + '...' : val;
+    document.getElementById('preview-desc').textContent = short || 'Your description will appear here...';
+  });
+
+  /* ---- Live preview: category badge ---- */
+  const catMap = {
+    food: ['badge-food', 'Food & Drink'],
+    study: ['badge-study', 'Study Spot'],
+    nature: ['badge-nature', 'Nature'],
+    nightlife: ['badge-nightlife', 'Nightlife'],
+    shopping: ['badge-shopping', 'Shopping'],
+    other: ['badge-other', 'Other']
+  };
+
+  document.getElementById('category').addEventListener('change', function () {
+    const badge = document.getElementById('preview-badge');
+    const [cls, label] = catMap[this.value] || ['badge-other', 'Other'];
+    badge.className = 'badge mb-2 ' + cls;
+    badge.textContent = label;
+  });
+
+  /* ---- Star rating picker ---- */
+  const starPicker = document.getElementById('star-picker');
+  const starIcons  = starPicker.querySelectorAll('[data-value]');
+
+  function renderPickerStars(filled) {
+    starIcons.forEach(function (s) {
+      const v = parseInt(s.dataset.value);
+      s.className = v <= filled ? 'bi bi-star-fill' : 'bi bi-star';
+    });
+  }
+
+  function renderPreviewStars(val) {
+    let html = '';
+    for (let i = 1; i <= 5; i++) {
+      html += i <= val ? '<i class="bi bi-star-fill"></i>' : '<i class="bi bi-star"></i>';
+    }
+    html += '<small class="text-muted ms-1">' + val + '</small>';
+    document.getElementById('preview-stars').innerHTML = html;
+  }
+
+  // Hover: preview fill
+  starPicker.addEventListener('mouseover', function (e) {
+    const star = e.target.closest('[data-value]');
+    if (star) renderPickerStars(parseInt(star.dataset.value));
+  });
+
+  // Mouse leave: restore current rating
+  starPicker.addEventListener('mouseleave', function () {
+    renderPickerStars(parseInt(document.getElementById('rating-value').value) || 0);
+  });
+
+  // Click: commit rating
+  starPicker.addEventListener('click', function (e) {
+    const star = e.target.closest('[data-value]');
+    if (!star) return;
+    const val = parseInt(star.dataset.value);
+    document.getElementById('rating-value').value = val;
+    renderPickerStars(val);
+    renderPreviewStars(val);
+  });
+
+  /* ---- Form submit feedback ---- */
+  document.getElementById('checkin-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    const inputs = this.querySelectorAll('[required]');
+    inputs.forEach(input => {
+        if (input.value === '') {
+            alert(`${input.name} is required`);
+            return;
+        }
     });
 
-  } else if (pickerMap && !isVisible) {
-    // recalculate tiles after panel becomes visible
-    pickerMap.invalidateSize();
-  }
-});
-
-// update preview image and revoke previous object URL to free memory
-document.getElementById("photo-input").addEventListener("change", function () {
-  const previewImg = document.getElementById("preview-img");
-
-  // Release any previously created object URL to avoid memory leaks
-  if (previewImg.dataset.objectUrl) {
-    URL.revokeObjectURL(previewImg.dataset.objectUrl);
-    previewImg.dataset.objectUrl = '';
-  }
-
-  const file = this.files[0];
-  if (file) {
-    // Create a temporary local URL for the selected image file
-    const objectUrl = URL.createObjectURL(file);
-    previewImg.src = objectUrl;
-    // Store URL reference so we can revoke it on next change
-    previewImg.dataset.objectUrl = objectUrl;
-  } else {
-    // User cleared the file input — reset preview to placeholder
-    previewImg.src = 'https://picsum.photos/400/220?random=61';
-  }
-});
-
-// update preview title as user types
-document.getElementById('title').addEventListener('input', function () {
-  const val = this.value.trim();
-  document.getElementById('preview-title').textContent = val || 'Your Place Name';
-});
-
-// update preview description and character counter
-document.getElementById('description').addEventListener('input', function () {
-  const val   = this.value.trim();
-  const short = val.length > 100 ? val.substring(0, 100) + '...' : val;
-  document.getElementById('preview-desc').textContent =
-    short || 'Your description will appear here...';
-  document.getElementById('desc-char-count').textContent = this.value.length;
-});
-
-// category key to badge class and display label
-const catMap = {
-  food:      ['badge-food',      'Food & Drink'],
-  study:     ['badge-study',     'Study Spot'],
-  nature:    ['badge-nature',    'Nature'],
-  nightlife: ['badge-nightlife', 'Nightlife'],
-  shopping:  ['badge-shopping',  'Shopping'],
-  other:     ['badge-other',     'Other']
-};
-
-// update preview badge on category change
-document.getElementById('category').addEventListener('change', function () {
-  const badge        = document.getElementById('preview-badge');
-  const [cls, label] = catMap[this.value] || ['badge-other', 'Other'];
-  badge.className    = 'badge mb-2 ' + cls;
-  badge.textContent  = label;
-});
-
-// star picker
-const starPicker = document.getElementById('star-picker');
-const starIcons  = starPicker.querySelectorAll('[data-value]');
-
-// fill stars up to `filled` index in the picker widget
-function renderPickerStars(filled) {
-  starIcons.forEach(function (s) {
-    const v    = parseInt(s.dataset.value, 10);
-    s.className = v <= filled ? 'bi bi-star-fill' : 'bi bi-star';
-  });
-}
-
-// fill stars in the preview card
-function renderPreviewStars(val) {
-  let html = '';
-  for (let i = 1; i <= 5; i++) {
-    html += i <= val ? '<i class="bi bi-star-fill"></i>' : '<i class="bi bi-star"></i>';
-  }
-  html += '<small class="text-muted ms-1">' + val + '</small>';
-  document.getElementById('preview-stars').innerHTML = html;
-}
-
-// hover — preview fill
-starPicker.addEventListener('mouseover', function (e) {
-  const star = e.target.closest('[data-value]');
-  if (star) renderPickerStars(parseInt(star.dataset.value, 10));
-});
-
-// mouse leave — restore committed rating
-starPicker.addEventListener('mouseleave', function () {
-  renderPickerStars(parseInt(document.getElementById('rating-value').value, 10) || 0);
-});
-
-// click — commit rating
-starPicker.addEventListener('click', function (e) {
-  const star = e.target.closest('[data-value]');
-  if (!star) return;
-  const val = parseInt(star.dataset.value, 10);
-  document.getElementById('rating-value').value = val;
-  renderPickerStars(val);
-  renderPreviewStars(val);
-  document.getElementById('rating-error').classList.add('d-none');
-});
-
-// form validation and submit
-document.getElementById('checkin-form').addEventListener('submit', function (e) {
-  e.preventDefault();
-
-  // check all required text/select fields
-  const requiredInputs = this.querySelectorAll('[required]');
-  for (const input of requiredInputs) {
-    if (input.value.trim() === '') {
-      input.classList.add('is-invalid');
-      input.focus();
+    const lat = document.getElementById('lat_input').value;
+    const lng = document.getElementById('lng_input').value;
+    if (lat == '' || lng == '') {
+      alert('Please select a location on the map');
       return;
     }
-    input.classList.remove('is-invalid');
-  }
 
-  // check map coordinates
-  const lat = document.getElementById('lat_input').value;
-  const lng = document.getElementById('lng_input').value;
-  if (lat === '' || lng === '') {
-    const wrap = document.getElementById('map-picker-wrap');
-    wrap.style.display = 'block';
-    if (pickerMap) pickerMap.invalidateSize();
-    alert('Please click the map to select a location.');
-    return;
-  }
+    const photo = document.getElementById("photo-input");
+    if (!photo.files || photo.files.length === 0) {
+      alert("Please upload a photo");
+      return;
+    }
 
-  // check photo
-  const photo = document.getElementById('photo-input');
-  if (!photo.files || photo.files.length === 0) {
-    alert('Please upload at least one photo.');
-    return;
-  }
+    const rate = document.getElementById("rating-value").value;
+    if (rate === "0") {
+      alert("Please set a rate");
+      return;
+    }
 
-  // check star rating
-  const rate = document.getElementById('rating-value').value;
-  if (rate === '0') {
-    document.getElementById('rating-error').classList.remove('d-none');
-    starPicker.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    return;
-  }
+    this.submit();
+  });
 
-  // show spinner and disable button to prevent double submit
-  document.getElementById('submit-text').classList.add('d-none');
-  document.getElementById('submit-spinner').classList.remove('d-none');
-  document.getElementById('submit-btn').disabled = true;
-  this.submit();
-});
+  // {% if login_status == False %}
+  //   const modal = new bootstrap.Modal(document.getElementById("login_modal"));
+  //   modal.show()
+  // {% endif %}
 
-// show login modal after DOM is ready if user is not authenticated
+  // {% with messages = get_flashed_messages() %}
+  //   {% if messages %}
+  //     {% for message in messages %}
+  //       alert("{{ message }}");
+  //     {% endfor %}
+  //   {% endif %}
+  // {% endwith %}
+</script>
+
 {% if login_status == False %}
-document.addEventListener('DOMContentLoaded', function () {
-  var loginModal = new bootstrap.Modal(document.getElementById('login_modal'));
-  loginModal.show();
-});
+<script>
+  const modal = new bootstrap.Modal(document.getElementById("login_modal"));
+  modal.show()
+</script>
 {% endif %}
 
-</script>
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    {% for message in messages %}
+    <script>
+      alert("{{ message }}");
+    </script>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
 
 </body>
 </html>

@@ -374,18 +374,19 @@ def new_checkin():
         db.session.flush()
 
         # image test
-        image = request.files.get("input_image")
-        if image:
-            # generate unqiue filename to avoid conflicts
-            ext = image.filename.rsplit('.', 1)[1].lower()
-            filename = f"{uuid.uuid4()}.{ext}"
-            image_url = upload_image(image, filename)
-            
-            new_photo = Photo(
-                checkin_id = check_in.id,
-                url = image_url
-            )
-            db.session.add(new_photo)
+        images = request.files.getlist("input_image")
+        for image in images:
+            if image and image.filename != '':
+                # generate unqiue filename to avoid conflicts
+                ext = image.filename.rsplit('.', 1)[1].lower()
+                filename = f"{uuid.uuid4()}.{ext}"
+                image_url = upload_image(image, filename)
+
+                new_photo = Photo(
+                    checkin_id = check_in.id,
+                    url = image_url
+                )
+                db.session.add(new_photo)
         
         db.session.commit()
         return redirect(url_for("index"))
@@ -428,6 +429,7 @@ def profile():
             check_ins = check_ins,
             avg_rating = round(avg_rating, 1),
             favourite_check_ins = favourite_check_ins,
+            is_profile = True,
             favourited_checkin_ids=set(favourite_checkin_ids))
 
 @app.route("/update_profile", methods = ["POST"])
@@ -457,6 +459,19 @@ def update_profile():
         if is_changed == "True":
             user.avatar_url = img_url
         db.session.commit()
+
+    return redirect(url_for("profile"))
+
+@app.route("/delete_checkin/<int:checkin_id>", methods=["POST"])
+@login_required
+def delete_checkin(checkin_id):
+    # checkin = CheckIn.query.filter(CheckIn.id == checkin_id).first()
+    checkin = CheckIn.query.filter_by(
+        id=checkin_id,
+        user_id=current_user.id
+    ).first_or_404()
+    db.session.delete(checkin)
+    db.session.commit()
 
     return redirect(url_for("profile"))
 

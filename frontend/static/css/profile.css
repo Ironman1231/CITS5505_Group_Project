@@ -55,3 +55,7 @@
 .avatar-hover-text:hover {
   opacity: 1;
 }
+
+.btn_delete:hover {
+  background-color: #a71d2a !important;
+}
