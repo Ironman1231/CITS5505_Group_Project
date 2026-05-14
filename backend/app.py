@@ -111,6 +111,19 @@ def upload_image(file, filename):
     public_url = os.getenv("CLOUDFLARE_PUBLIC_URL")
     return f"{public_url}/{filename}"
 
+def delete_image(image_url):
+    """Delete an image from R2 using its public URL"""
+    bucket = os.getenv("CLOUDFLARE_BUCKET_NAME")
+
+    # Extract filename from URL
+    # e.g. https://pub-xxx.r2.dev/filename.jpg -> filename.jpg
+    filename = image_url.split("/")[-1]
+
+    s3.delete_object(
+        Bucket=bucket,
+        Key=filename
+    )
+
 # test: upload a test file
 try:
     s3.put_object(
@@ -470,6 +483,11 @@ def delete_checkin(checkin_id):
         id=checkin_id,
         user_id=current_user.id
     ).first_or_404()
+
+    photos = checkin.photos.all()
+    for photo in photos:
+        delete_image(photo.url)
+
     db.session.delete(checkin)
     db.session.commit()
 
