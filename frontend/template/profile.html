@@ -139,10 +139,7 @@
       <div class="row g-4">
 
         {% for check_in in check_ins %}
-          <form class="col-sm-6 col-lg-4 col-xl-3" method="post" action="{{ url_for('delete_checkin', checkin_id = check_in.id) }}">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-            {% include "_checkin_card.html" %}
-          </form>
+          {% include "_checkin_card.html" %}
         {% else %}
           <div class="col-12">
             <div class="bg-white border rounded-3 shadow-sm text-center p-5">
@@ -168,9 +165,7 @@
     <div class="tab-pane fade" id="saved" role="tabpanel">
       <div class="row g-4">
         {% for check_in in favourite_check_ins %}
-          <div class="col-sm-6 col-lg-4 col-xl-3">
-            {% include "_checkin_card.html" %}
-          </div>
+          {% include "_checkin_card.html" %}
         {% else %}
           <div class="col-12">
             <div class="bg-white border rounded-3 shadow-sm text-center p-5">

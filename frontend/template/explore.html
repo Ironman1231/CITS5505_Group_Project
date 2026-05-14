@@ -95,9 +95,7 @@
   <div class="row g-4">
 
     {% for check_in in check_ins %}
-      <div class="col-sm-6 col-lg-4 col-xl-3">
-        {% include "_checkin_card.html" %}
-      </div>
+      {% include "_checkin_card.html" %}
     {% else %}
       <div class="col-12">
         <div class="bg-white border rounded-3 shadow-sm text-center p-5">

@@ -433,7 +433,11 @@ def update_profile():
 @app.route("/delete_checkin/<int:checkin_id>", methods=["POST"])
 @login_required
 def delete_checkin(checkin_id):
-    checkin = CheckIn.query.filter(CheckIn.id == checkin_id).first()
+    # checkin = CheckIn.query.filter(CheckIn.id == checkin_id).first()
+    checkin = CheckIn.query.filter_by(
+        id=checkin_id,
+        user_id=current_user.id
+    ).first_or_404()
     db.session.delete(checkin)
     db.session.commit()
 
