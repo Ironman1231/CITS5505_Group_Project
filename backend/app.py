@@ -393,18 +393,23 @@ def new_checkin():
 
         # image test
         images = request.files.getlist("input_image")
-        for image in images:
-            if image and image.filename != '':
-                # generate unqiue filename to avoid conflicts
-                ext = image.filename.rsplit('.', 1)[1].lower()
-                filename = f"{uuid.uuid4()}.{ext}"
-                image_url = upload_image(image, filename)
+        try:
+            for image in images:
+                if image and image.filename != '':
+                    # generate unqiue filename to avoid conflicts
+                    ext = image.filename.rsplit('.', 1)[1].lower()
+                    filename = f"{uuid.uuid4()}.{ext}"
+                    image_url = upload_image(image, filename)
 
-                new_photo = Photo(
-                    checkin_id = check_in.id,
-                    url = image_url
-                )
-                db.session.add(new_photo)
+                    new_photo = Photo(
+                        checkin_id = check_in.id,
+                        url = image_url
+                    )
+                    db.session.add(new_photo)
+        except Exception as error:
+            db.session.rollback()
+            flash(f"Image upload failed: {error}", "danger")
+            return redirect(url_for("new_checkin"))
         
         db.session.commit()
         return redirect(url_for("index"))
