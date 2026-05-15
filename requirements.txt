@@ -30,6 +30,10 @@ python-dotenv==1.2.1
 typing_extensions==4.15.0
 WTForms==3.2.1
 
+# Testing
+pytest==9.0.1
+selenium==4.39.0
+
 
 greenlet==3.4.0
 itsdangerous==2.2.0
