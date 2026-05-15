@@ -41,3 +41,37 @@ def test_register_new_user_successfully(client):
         assert user is not None
         assert user.username == "newuser"
         assert user.email == "newuser@example.com"
+
+
+# [Unit Test] Register with duplicate username fails
+def test_register_duplicate_username_fails(client):
+    # Create an existing user in the database first
+    with app.app_context():
+        existing_user = User(
+            username="takenuser",
+            email="original@example.com",
+            password_hash=generate_password_hash("password123"),
+        )
+        db.session.add(existing_user)
+        db.session.commit()
+
+    # POST registration data with the same username but a different email
+    response = client.post(
+        "/register.html",
+        data={
+            "username": "takenuser",
+            "email": "different@example.com",
+            "password": "securepassword123",
+            "confirm_password": "securepassword123",
+        },
+        follow_redirects=True,
+    )
+
+    # Verify the response status code is 200 (re-renders the form with an error)
+    assert response.status_code == 200
+
+    # Verify only one user with that username exists in the database
+    with app.app_context():
+        users = User.query.filter_by(username="takenuser").all()
+        assert len(users) == 1
+
