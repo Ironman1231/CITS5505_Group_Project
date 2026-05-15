@@ -115,3 +115,33 @@ def js_click(driver, element):
     """Click an element using JavaScript to bypass interception."""
     driver.execute_script("arguments[0].scrollIntoView(true);", element)
     driver.execute_script("arguments[0].click();", element)
+
+# ------------------------------------------------------------------ #
+# Selenium Test 1: Submit new checkin form successfully                #
+# ------------------------------------------------------------------ #
+class TestCheckinFormSubmit:
+
+    def test_submit_checkin_form_successfully(self, driver):
+        login(driver)
+        safe_get(driver, f"{BASE_URL}/new-checkin.html")
+        fill_checkin_form(driver, include_location=True)
+
+        # Set lat/lng directly via JavaScript to bypass JS validation
+        driver.execute_script("""
+            document.getElementById('lat_input').value = '-31.9505';
+            document.getElementById('lng_input').value = '115.8605';
+            document.getElementById('rating-value').value = '4';
+        """)
+
+        # Submit the form directly via JavaScript, bypassing JS validation
+        driver.execute_script("document.getElementById('checkin-form').submit();")
+
+        import time
+        time.sleep(2)  # wait for redirect
+        print(f"\nURL after submit: {driver.current_url}")
+
+        WebDriverWait(driver, 10).until(
+            lambda d: "new-checkin" not in d.current_url
+        )
+
+        assert driver.current_url == f"{BASE_URL}/" or "/index" in driver.current_url
