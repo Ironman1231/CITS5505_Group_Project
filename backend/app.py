@@ -21,6 +21,8 @@ from dotenv import load_dotenv
 from werkzeug.utils import secure_filename
 import uuid
 
+load_dotenv()
+
 EXPLORE_CATEGORIES = {
     "food": "Food & Drink",
     "study": "Study Spot",
@@ -34,6 +36,13 @@ EXPLORE_SORT_OPTIONS = {
     "rating": "Highest Rated",
 }
 CATETORIES = ["food", "study", "nature", "nightlife", "shopping", "other"]
+R2_REQUIRED_ENV_VARS = (
+    "CLOUDFLARE_ACCOUNT_ID",
+    "CLOUDFLARE_ACCESS_KEY_ID",
+    "CLOUDFLARE_SECRET_ACCESS_KEY",
+    "CLOUDFLARE_BUCKET_NAME",
+    "CLOUDFLARE_PUBLIC_URL",
+)
 
 
 def escape_like_search(value):
@@ -86,21 +95,28 @@ login_manager.login_message = "Please log in to access this page."
 login_manager.login_message_category = "warning"
 csrf.init_app(app)
 
-# set up cloudflare s3
-s3 = boto3.client(
-    's3',
-    endpoint_url=f"https://{os.getenv("CLOUDFLARE_ACCOUNT_ID")}.r2.cloudflarestorage.com",
-    aws_access_key_id=os.getenv('CLOUDFLARE_ACCESS_KEY_ID'),
-    aws_secret_access_key=os.getenv("CLOUDFLARE_SECRET_ACCESS_KEY"),
-    region_name="auto"
-)
+def get_r2_client():
+    """Build the Cloudflare R2 client only when an upload/delete is requested."""
+    missing = [name for name in R2_REQUIRED_ENV_VARS if not os.getenv(name)]
+    if missing:
+        raise RuntimeError(
+            "Cloudflare R2 is not configured. Missing environment variables: "
+            + ", ".join(missing)
+        )
+    return boto3.client(
+        "s3",
+        endpoint_url=f"https://{os.getenv('CLOUDFLARE_ACCOUNT_ID')}.r2.cloudflarestorage.com",
+        aws_access_key_id=os.getenv("CLOUDFLARE_ACCESS_KEY_ID"),
+        aws_secret_access_key=os.getenv("CLOUDFLARE_SECRET_ACCESS_KEY"),
+        region_name="auto",
+    )
 
 # upload image to cloudflare R2
 def upload_image(file, filename):
     """Upload an image to R2 and return the public URL"""
     bucket = os.getenv("CLOUDFLARE_BUCKET_NAME")
 
-    s3.upload_fileobj(
+    get_r2_client().upload_fileobj(
         file,
         bucket,
         filename,
@@ -108,7 +124,7 @@ def upload_image(file, filename):
     )
 
     # return the public URL
-    public_url = os.getenv("CLOUDFLARE_PUBLIC_URL")
+    public_url = os.getenv("CLOUDFLARE_PUBLIC_URL").rstrip("/")
     return f"{public_url}/{filename}"
 
 def delete_image(image_url):
@@ -119,21 +135,10 @@ def delete_image(image_url):
     # e.g. https://pub-xxx.r2.dev/filename.jpg -> filename.jpg
     filename = image_url.split("/")[-1]
 
-    s3.delete_object(
+    get_r2_client().delete_object(
         Bucket=bucket,
         Key=filename
     )
-
-# test: upload a test file
-try:
-    s3.put_object(
-        Bucket=os.getenv('CLOUDFLARE_BUCKET_NAME'),
-        Key='test.txt',
-        Body=b'hello world'
-    )
-    print("Upload successful!")
-except Exception as e:
-    print("Upload failed:", e)
 
 
 @login_manager.user_loader
