@@ -145,3 +145,56 @@ class TestCheckinFormSubmit:
         )
 
         assert driver.current_url == f"{BASE_URL}/" or "/index" in driver.current_url
+
+
+# ------------------------------------------------------------------ #
+# Selenium Test 2: Delete a checkin from profile page                  #
+# ------------------------------------------------------------------ #
+class TestCheckinDelete:
+
+    def test_delete_checkin_from_profile(self, driver):
+        """
+        A logged-in user should be able to delete their own checkin
+        from the profile page and it should no longer appear.
+        """
+        # First create a checkin to delete
+        login(driver)
+        safe_get(driver, f"{BASE_URL}/new-checkin.html")
+        fill_checkin_form(driver, include_location=True)
+
+        driver.execute_script("""
+            document.getElementById('lat_input').value = '-31.9505';
+            document.getElementById('lng_input').value = '115.8605';
+            document.getElementById('rating-value').value = '4';
+        """)
+
+        driver.execute_script("document.getElementById('checkin-form').submit();")
+
+        # Wait for redirect to home page after checkin created
+        WebDriverWait(driver, 10).until(
+            lambda d: "new-checkin" not in d.current_url
+        )
+
+        # Navigate to profile page
+        safe_get(driver, f"{BASE_URL}/profile.html")
+
+        # Wait for profile page to load
+        WebDriverWait(driver, 5).until(
+            EC.presence_of_element_located((By.CLASS_NAME, "btn_delete"))
+        )
+
+        # Count checkins before deleting
+        checkins_before = len(driver.find_elements(By.CLASS_NAME, "card-title"))
+
+        # Click the first delete button
+        delete_btn = driver.find_element(By.CLASS_NAME, "btn_delete")
+        driver.execute_script("arguments[0].click();", delete_btn)
+
+        # Wait for redirect back to profile
+        WebDriverWait(driver, 5).until(
+            EC.url_contains("profile")
+        )
+
+        # Verify the count decreased by 1
+        checkins_after = len(driver.find_elements(By.CLASS_NAME, "card-title"))
+        assert checkins_after == checkins_before - 1
