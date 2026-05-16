@@ -68,3 +68,43 @@ class TestLoginRedirect:
 
         # Verify the user is on the home page
         assert driver.current_url == f"{BASE_URL}/" or "/index" in driver.current_url
+
+
+# ------------------------------------------------------------------ #
+# Selenium Test: Login with invalid credentials shows error    #128   #
+# ------------------------------------------------------------------ #
+class TestLoginInvalidCredentials:
+
+    def test_login_invalid_credentials_stays_on_login(self, driver):
+        # Navigate to /login.html
+        driver.get(f"{BASE_URL}/login.html")
+
+        # Wait for the login form to be visible
+        WebDriverWait(driver, 10).until(
+            EC.visibility_of_element_located((By.ID, "login-username"))
+        )
+
+        # Fill in a non-existent username and wrong password
+        driver.find_element(By.ID, "login-username").send_keys("nonexistentuser")
+        driver.find_element(By.ID, "login-password").send_keys("wrongpassword123")
+
+        # Click the submit button
+        driver.find_element(
+            By.CSS_SELECTOR, "#login-form button[type='submit']"
+        ).click()
+
+        # Dismiss any alert that may appear
+        dismiss_any_alert(driver)
+
+        # Verify the URL still contains "login"
+        WebDriverWait(driver, 10).until(
+            lambda d: "login" in d.current_url
+        )
+        assert "login" in driver.current_url
+
+        # Verify an error message is visible on the page
+        error_alert = WebDriverWait(driver, 10).until(
+            EC.visibility_of_element_located((By.CSS_SELECTOR, ".alert"))
+        )
+        assert error_alert.is_displayed()
+
