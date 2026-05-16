@@ -348,18 +348,6 @@
     this.submit();
   });
 
-  // {% if login_status == False %}
-  //   const modal = new bootstrap.Modal(document.getElementById("login_modal"));
-  //   modal.show()
-  // {% endif %}
-
-  // {% with messages = get_flashed_messages() %}
-  //   {% if messages %}
-  //     {% for message in messages %}
-  //       alert("{{ message }}");
-  //     {% endfor %}
-  //   {% endif %}
-  // {% endwith %}
 </script>
 
 {% if login_status == False %}
@@ -368,14 +356,16 @@
   modal.show()
 </script>
 {% endif %}
-
-{% with messages = get_flashed_messages() %}
+{% with messages = get_flashed_messages(with_categories=true) %}
   {% if messages %}
-    {% for message in messages %}
-    <script>
-      alert("{{ message }}");
-    </script>
-    {% endfor %}
+    <div class="container mt-2">
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endfor %}
+    </div>
   {% endif %}
 {% endwith %}
 
