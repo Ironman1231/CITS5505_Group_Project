@@ -319,12 +319,12 @@
   document.getElementById('checkin-form').addEventListener('submit', function (e) {
     e.preventDefault();
     const inputs = this.querySelectorAll('[required]');
-    inputs.forEach(input => {
+    for (const input of inputs) {
         if (input.value === '') {
             alert(`${input.name} is required`);
             return;
         }
-    });
+    }
 
     const lat = document.getElementById('lat_input').value;
     const lng = document.getElementById('lng_input').value;
