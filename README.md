@@ -8,6 +8,10 @@ browse check-ins on the home and explore pages, search and filter places, view
 check-in details, add comments, favourite places, and manage their own profile
 content.
 
+The interface centres on an interactive Leaflet map showing community check-ins,
+with card-based browse and explore pages, a profile page for managing personal
+content, and a detail page for comments and favourites.
+
 The application uses Flask, Jinja templates, SQLAlchemy, Flask-Migrate,
 Flask-Login, Flask-WTF CSRF protection, SQLite for local development.
 
