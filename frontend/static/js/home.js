@@ -7,16 +7,16 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 }).addTo(map);
 
 markerData.forEach(function(m) {
-  var popup = document.createElement('div');
+  const popup = document.createElement('div');
   popup.className = 'perthpins-popup';
 
-  var title = document.createElement('strong');
+  const title = document.createElement('strong');
   title.className = 'perthpins-popup-title';
-  title.textContent = m.title;
+  title.textContent = m.title || 'Untitled';
 
-  var category = document.createElement('span');
+  const category = document.createElement('span');
   category.className = 'perthpins-popup-category';
-  category.textContent = m.category;
+  category.textContent = m.category || 'Uncategorised';
 
   popup.appendChild(title);
   popup.appendChild(category);
