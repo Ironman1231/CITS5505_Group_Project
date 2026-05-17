@@ -139,4 +139,16 @@ Run one specific test:
 
 ```bash
 python -m pytest tests/test_auth.py::test_register_new_user_successfully
+
+The following code will be decided on whether it should be kept after running the test.
+> TODO
+
+For test_checkin_selenium.py file, run following code
+
+```bash
+pytest tests/test_checkin_selenium.py
+```
+For test_checkin.py file, run following code
+```bash
+DATABASE_URL="sqlite:///:memory:" pytest tests/test_checkin.py
 ```
