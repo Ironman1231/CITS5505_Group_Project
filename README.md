@@ -47,9 +47,6 @@ http://127.0.0.1:5000
 
 ```bash
 source .venv/bin/activate
-rm backend/migrations/.gitkeep
-flask --app backend.app db init
-flask --app backend.app db migrate -m "initial schema"
 flask --app backend.app db upgrade
 flask --app backend.app run --debug
 ```
@@ -65,6 +62,14 @@ After the database and migrations have already been created, run the application
 ```bash
 source .venv/bin/activate
 flask --app backend.app run --debug
+```
+
+To inspect or roll back the latest database migration:
+
+```bash
+flask --app backend.app db history
+flask --app backend.app db downgrade 48aac9de597d
+flask --app backend.app db upgrade
 ```
 
 
