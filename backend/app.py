@@ -489,7 +489,7 @@ def update_profile():
             return redirect(url_for("profile"))
         
         user = User.query.filter_by(username = new_username).first()
-        if user:
+        if user and user != current_user:
             flash("The username already exist")
             print("The username already exist")
             return redirect(url_for("profile"))
