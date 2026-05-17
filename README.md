@@ -112,7 +112,7 @@ demo data from scratch, run:
 
 ```bash
 source .venv/bin/activate
-python seed_demo_data.py
+python tests/seed_demo_data.py
 ```
 
 This clears the local application data, uploads demo images to the configured
