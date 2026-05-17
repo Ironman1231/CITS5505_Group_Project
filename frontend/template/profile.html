@@ -146,13 +146,6 @@
         {% endfor %}
 
       </div>
-
-      <!-- Load more -->
-      <!-- <div class="text-center mt-4">
-        <button class="btn btn-outline-secondary px-4">
-          Load More <i class="bi bi-chevron-down ms-1"></i>
-        </button>
-      </div> -->
     </div><!-- /mycheckins tab -->
 
 
@@ -188,13 +181,13 @@
 
 <script>
   document.getElementById("edit_button").addEventListener("click", function() {
-    avatar_image = document.getElementById("avator_image");
-    avatar_input = document.getElementById("avatar_label");
-    username_view = document.getElementById("username_view");
-    username_edit = document.getElementById("username_edit");
-    bio_view = document.getElementById("bio_view");
-    bio_edit = document.getElementById("bio_edit");
-    save_button = document.getElementById("save_button")
+    const avatar_image = document.getElementById("avator_image");
+    const avatar_input = document.getElementById("avatar_label");
+    const username_view = document.getElementById("username_view");
+    const username_edit = document.getElementById("username_edit");
+    const bio_view = document.getElementById("bio_view");
+    const bio_edit = document.getElementById("bio_edit");
+    const save_button = document.getElementById("save_button");
 
     avatar_image.classList.add("d-none");
     avatar_input.classList.remove("d-none");
@@ -219,7 +212,7 @@
   // avatar upload
   document.getElementById("photo_input").addEventListener("change", function() {
     const preview = document.getElementById("new_avator_image");
-    record_change = document.getElementById("record_change")
+    const record_change = document.getElementById("record_change");
 
     const file = this.files[0];
     if (file) {
@@ -243,14 +236,14 @@
   })
 
   document.getElementById("mycheckins-tab").addEventListener("click", () => {
-    delete_btn = document.querySelectorAll(".btn_delete");
+    const delete_btn = document.querySelectorAll(".btn_delete");
     delete_btn.forEach((btn) => {
       btn.classList.remove("d-none");
     })
   })
 
   document.getElementById("saved-tab").addEventListener("click", () => {
-    delete_btn = document.querySelectorAll(".btn_delete");
+    const delete_btn = document.querySelectorAll(".btn_delete");
     delete_btn.forEach((btn) => {
       btn.classList.add("d-none");
     })
