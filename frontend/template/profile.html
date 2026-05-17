@@ -16,6 +16,21 @@
 <div id="navbar-placeholder"></div>
 -->
 {% include "navbar.html" %}
+{% set flashed_messages = get_flashed_messages(with_categories=true) %}
+
+{% if flashed_messages %}
+  <div class="container mt-3">
+    {% for category, message in flashed_messages %}
+      {% if category != "baduser" %}
+        {% set alert_class = category if category in ["success", "danger", "warning", "info"] else "info" %}
+        <div class="alert alert-{{ alert_class }} alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+{% endif %}
 
 <!-- set the url of avatar -->
 {% if not user.avatar_url %}
@@ -250,28 +265,16 @@
   })
 </script>
 
-{% with messages = get_flashed_messages(with_categories = True) %}
-  {% if messages %}
-    {% for category, message in messages %}
-      {% if category == "baduser" %}
-        <script>
-          const modal = new bootstrap.Modal(document.getElementById("login_modal"));
-          modal.show()
-        </script>
-      {% endif %}
-    {% endfor %}
-  {% endif %}
-{% endwith %}
-
-{% with messages = get_flashed_messages() %}
-  {% if messages %}
-    {% for message in messages %}
+{% if flashed_messages %}
+  {% for category, message in flashed_messages %}
+    {% if category == "baduser" %}
       <script>
-        alert("{{ message }}")
+        const modal = new bootstrap.Modal(document.getElementById("login_modal"));
+        modal.show();
       </script>
-    {% endfor %}
-  {% endif %}
-{% endwith %}
+    {% endif %}
+  {% endfor %}
+{% endif %}
 
 </body>
 </html>
