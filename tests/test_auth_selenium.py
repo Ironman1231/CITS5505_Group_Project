@@ -1,3 +1,4 @@
+import os
 import pytest
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -5,10 +6,10 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.alert import Alert
 
-BASE_URL = "http://127.0.0.1:5000"
-TEST_USERNAME = "seleniumtestuser"
+BASE_URL      = os.getenv("FLASK_BASE_URL", "http://127.0.0.1:5000")
+TEST_USERNAME = os.getenv("TEST_USERNAME", "seleniumtestuser")
 TEST_EMAIL    = "seleniumtestuser@example.com"
-TEST_PASSWORD = "TestPassword123"
+TEST_PASSWORD = os.getenv("TEST_PASSWORD", "TestPassword123")
 
 
 def dismiss_any_alert(driver, timeout=3):
@@ -100,7 +101,7 @@ class TestLoginRedirect:
         assert "login" not in driver.current_url
 
         # Verify the user is on the home page
-        assert driver.current_url == f"{BASE_URL}/" or "/index" in driver.current_url
+        assert driver.current_url == f"{BASE_URL}/" or ("/index" in driver.current_url)
 
 
 # ------------------------------------------------------------------ #
@@ -135,8 +136,9 @@ class TestLoginInvalidCredentials:
         )
         assert "login" in driver.current_url
 
-        # Verify an error message is visible on the page
+        # Verify an error message is visible and contains error text
         error_alert = WebDriverWait(driver, 10).until(
             EC.visibility_of_element_located((By.CSS_SELECTOR, ".alert"))
         )
         assert error_alert.is_displayed()
+        assert "invalid" in error_alert.text.lower()
