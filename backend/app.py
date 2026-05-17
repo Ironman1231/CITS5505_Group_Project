@@ -487,8 +487,8 @@ def update_profile():
             print("Please type username")
             return redirect(url_for("profile"))
         
-        user = User.query.filter_by(username = new_username).first()
-        if user and user != current_user:
+        duplicated_user = User.query.filter_by(username = new_username).first()
+        if duplicated_user and duplicated_user != current_user:
             flash("The username already exist")
             print("The username already exist")
             return redirect(url_for("profile"))
