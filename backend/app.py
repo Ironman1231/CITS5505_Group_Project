@@ -469,9 +469,8 @@ def update_profile():
             flash("Please choose an image")
             print("Please choose an image")
             return redirect(url_for("profile")) 
+
         # convert image to url
-        if current_user.avatar_url:
-            delete_image(current_user.avatar_url)
         ext = img.filename.rsplit('.', 1)[1].lower()
         filename = f"{uuid.uuid4()}.{ext}"
         new_img_url = upload_image(img, filename)
@@ -502,7 +501,10 @@ def update_profile():
         user.username = new_username
         user.new_bio = new_bio
         if is_changed == "True":
+            if current_user.avatar_url:
+                delete_image(current_user.avatar_url)
             user.avatar_url = new_img_url
+
         db.session.commit()
 
     return redirect(url_for("profile"))
