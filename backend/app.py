@@ -499,7 +499,7 @@ def update_profile():
             return redirect(url_for("profile"))
     
         user.username = new_username
-        user.new_bio = new_bio
+        user.bio = new_bio
         if is_changed == "True":
             if current_user.avatar_url:
                 delete_image(current_user.avatar_url)
