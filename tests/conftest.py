@@ -18,7 +18,7 @@ os.environ.setdefault(
     f"sqlite:///{os.path.join('/private/tmp', f'perthpins_pytest_{os.getpid()}.db')}",
 )
 
-import backend.app as app_module
+import backend.routes as routes_module
 from backend.app import app, db
 from backend.models import User
 
@@ -39,11 +39,11 @@ def app_context(monkeypatch):
         WTF_CSRF_ENABLED=False,
     )
     monkeypatch.setattr(
-        app_module,
+        routes_module,
         "upload_image",
         lambda file, filename: f"https://example.test/uploads/{filename}",
     )
-    monkeypatch.setattr(app_module, "delete_image", lambda image_url: None)
+    monkeypatch.setattr(routes_module, "delete_image", lambda image_url: None)
 
     with app.app_context():
         db.session.remove()
