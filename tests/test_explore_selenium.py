@@ -53,7 +53,7 @@ def test_category_filter_updates_url(driver):
     Select(category_select).select_by_value("nature")
 
     filter_form = driver.find_element(By.CSS_SELECTOR, "form.filter-bar")
-    filter_form.submit()
+    filter_form.find_element(By.CSS_SELECTOR, "button[type='submit']").click()
 
     WebDriverWait(driver, 10).until(
         lambda browser: "category=nature" in browser.current_url
