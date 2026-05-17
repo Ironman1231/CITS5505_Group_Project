@@ -2,7 +2,7 @@
 
 Run from the project root after creating a local .env file:
 
-    python3 test_r2.py
+    python3 tests/test_r2.py
 """
 
 from io import BytesIO
