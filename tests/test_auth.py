@@ -12,8 +12,8 @@ def test_register_new_user_successfully(client):
         data={
             "username": "newuser",
             "email": "newuser@example.com",
-            "password": "securepassword123",
-            "confirm_password": "securepassword123",
+            "password": "Securepassword123",
+            "confirm_password": "Securepassword123",
         },
         follow_redirects=True,
     )

@@ -1,6 +1,7 @@
 """Routes and request handlers"""
 
 import os
+import re
 import uuid
 
 import boto3
@@ -621,7 +622,17 @@ def register_routes(app):
             if password != confirm_password:
                 flash("Passwords do not match!", "danger")
                 return render_template("register.html", form_data=form_data)
-    
+
+            if len(password) < 8:
+                flash("Password must be at least 8 characters.", "danger")
+                return render_template("register.html", form_data=form_data)
+            if not re.search(r"[A-Z]", password):
+                flash("Password must contain at least one uppercase letter.", "danger")
+                return render_template("register.html", form_data=form_data)
+            if not re.search(r"[0-9]", password):
+                flash("Password must contain at least one number.", "danger")
+                return render_template("register.html", form_data=form_data)
+
             existing_user = User.query.filter(
                 (User.username == username) | (User.email == email)
             ).first()
@@ -651,7 +662,8 @@ def register_routes(app):
         search_pattern = f"%{escape_like_search(query)}%"
         check_ins = CheckIn.query.filter(
             (CheckIn.title.ilike(search_pattern, escape="\\")) |
-            (CheckIn.description.ilike(search_pattern, escape="\\"))
+            (CheckIn.description.ilike(search_pattern, escape="\\")) |
+            (CheckIn.place_name.ilike(search_pattern, escape="\\"))
         ).order_by(CheckIn.created_at.desc()).all()
         return render_template(
             "explore.html",
