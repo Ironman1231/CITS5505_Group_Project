@@ -183,6 +183,12 @@ Run one test file:
 python -m pytest tests/test_auth.py
 ```
 
+or just
+
+```bash
+pytest tests/test_auth.py
+```
+
 Run one specific test:
 
 ```bash
