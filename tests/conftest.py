@@ -1,6 +1,7 @@
 import os
 import socket
 import sys
+import tempfile
 import threading
 
 import pytest
@@ -15,7 +16,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 # any test module imports the app object.
 os.environ.setdefault(
     "DATABASE_URL",
-    f"sqlite:///{os.path.join('/private/tmp', f'perthpins_pytest_{os.getpid()}.db')}",
+    f"sqlite:///{os.path.join(tempfile.gettempdir(), f'perthpins_pytest_{os.getpid()}.db')}",
 )
 
 import backend.routes as routes_module
