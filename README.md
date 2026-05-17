@@ -2,26 +2,46 @@
 
 ## Application Description
 
-PerthPins is a Flask web application for discovering, 
-sharing, and saving local places around Perth.
+PerthPins is a Flask web application for discovering, sharing, and saving local
+places around Perth. Users can register and log in, create location check-ins,
+browse check-ins on the home and explore pages, search and filter places, view
+check-in details, add comments, favourite places, and manage their own profile
+content.
+
+The application uses Flask, Jinja templates, SQLAlchemy, Flask-Migrate,
+Flask-Login, Flask-WTF CSRF protection, SQLite for local development.
 
 ---
 
 ## Team Members
 
-| UWA ID   | Name.                 | GitHub Username  |
+| UWA ID   | Name                  | GitHub Username  |
 |----------|-----------------------|------------------|
 | 24133154 | Zhiqiang Meng         | Michael-24133154 |
 | 25086027 | Prathish Vijaya Kumar | prat4677         |
 | 24665878 | Zhichao Liu           | Ironman1231      |
-|          |                       |                  |
 
+---
+
+## Project Structure
+
+```text
+backend/              Flask application, routes, models, config, extensions
+backend/instance/     Local SQLite database location
+backend/migrations/   Flask-Migrate/Alembic migration files
+frontend/template/    Jinja templates
+frontend/static/      CSS, JavaScript, images, and frontend assets
+tests/                Pytest and Selenium tests
+docs/                 Additional project and database documentation
+```
+
+---
 
 ## How to Run the Application
 
 Run all commands from the project root directory.
 
-### Install the Dependencies
+### 1. Install the Dependencies
 
 ```bash
 python3 -m venv .venv
@@ -30,7 +50,58 @@ pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-### Option 1: Run the Application with existing Database
+### 2. Configure Environment Variables
+
+For local development, the application can run with the default development
+configuration. The local SQLite database is created at:
+
+```text
+backend/instance/perth_explorer.db
+```
+
+Optional environment variables:
+
+```text
+SECRET_KEY                    Flask session and CSRF signing key
+DATABASE_URL                  Optional custom SQLAlchemy database URL
+CLOUDFLARE_ACCOUNT_ID         Cloudflare R2 account ID
+CLOUDFLARE_ACCESS_KEY_ID      Cloudflare R2 access key
+CLOUDFLARE_SECRET_ACCESS_KEY  Cloudflare R2 secret key
+CLOUDFLARE_BUCKET_NAME        Cloudflare R2 bucket name
+CLOUDFLARE_PUBLIC_URL         Public base URL for uploaded images
+```
+
+If the Cloudflare variables are not configured, pages can still be viewed, but
+new image uploads will not be available.
+
+### 3. Prepare the Database
+
+If this is the first time running the project, or if the local database file has
+been removed, run:
+
+```bash
+source .venv/bin/activate
+flask --app backend.app db upgrade
+```
+
+This creates or updates the local SQLite database using the migration files.
+
+Useful database commands:
+
+```bash
+flask --app backend.app db current
+flask --app backend.app db history
+flask --app backend.app db upgrade
+flask --app backend.app db downgrade 48aac9de597d
+```
+
+More detailed database operation notes are available in:
+
+```text
+docs/db_operations.md
+```
+
+### 4. Run the Application
 
 ```bash
 source .venv/bin/activate
@@ -43,33 +114,10 @@ Then open:
 http://127.0.0.1:5000
 ```
 
-### Option 2: Prepare the Database, Then Run the Application
+If port `5000` is already in use, run the app on another port:
 
 ```bash
-source .venv/bin/activate
-flask --app backend.app db upgrade
-flask --app backend.app run --debug
-```
-
-The default local SQLite database file is generated at:
-
-```text
-backend/instance/perth_explorer.db
-```
-
-After the database and migrations have already been created, run the application with:
-
-```bash
-source .venv/bin/activate
-flask --app backend.app run --debug
-```
-
-To inspect or roll back the latest database migration:
-
-```bash
-flask --app backend.app db history
-flask --app backend.app db downgrade 48aac9de597d
-flask --app backend.app db upgrade
+flask --app backend.app run --debug --port 5001
 ```
 
 
@@ -86,8 +134,8 @@ source .venv/bin/activate
 ### Default Test Suite
 
 The default test command runs the Flask test-client tests and skips Selenium
-browser tests. These tests use a pytest-only SQLite database under `/private/tmp`
-and do not touch the development database.
+browser tests. These tests use a pytest-only SQLite database and do not touch
+the development database.
 
 ```bash
 python -m pytest
@@ -139,25 +187,4 @@ Run one specific test:
 
 ```bash
 python -m pytest tests/test_auth.py::test_register_new_user_successfully
-```
-
-### Attation!
-If you are runing test on systems other than Mac, you should adjust the conftest.py as following:
-
-- comment the configuration on setting up database, which is
-
-```bash
-os.environ.setdefault(
-    "DATABASE_URL",
-    f"sqlite:///{os.path.join('/private/tmp', f'perthpins_pytest_{os.getpid()}.db')}",
-)
-```
-
-- add your own database configuration, for exampple:
-
-```bash
-os.environ.setdefault(
-    "DATABASE_URL",
-    "sqlite:///:memory:"
-)
 ```
