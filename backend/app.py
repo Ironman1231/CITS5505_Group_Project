@@ -458,13 +458,17 @@ def profile():
 @app.route("/update_profile", methods = ["POST"])
 @login_required
 def update_profile():
-    username = request.form.get("new_username")
-    bio = request.form.get("new_bio")
+    new_username = request.form.get("new_username").strip()
+    new_bio = request.form.get("new_bio").strip()
     is_changed = request.form.get("is_changed")
     img_url = None
 
     if is_changed == "True":
         img = request.files.get("avatar_image")
+        if not img:
+            flash("Please choose an image")
+            print("Please choose an image")
+            return redirect(url_for("profile")) 
         # convert image to url
         ext = img.filename.rsplit('.', 1)[1].lower()
         filename = f"{uuid.uuid4()}.{ext}"
@@ -477,8 +481,24 @@ def update_profile():
         flash("Please login first", "baduser")
         return render_template("profile.html")
     else:
-        user.username = username
-        user.bio = bio
+        if not new_username:
+            flash("Please type username")
+            print("Please type username")
+            return redirect(url_for("profile"))
+        
+        user = User.query.filter_by(username = new_username).first()
+        if user:
+            flash("The username already exist")
+            print("The username already exist")
+            return redirect(url_for("profile"))
+        
+        if not new_bio:
+            flash("Please type username")
+            print("Please type username")
+            return redirect(url_for("profile"))
+    
+        user.username = new_username
+        user.new_bio = new_bio
         if is_changed == "True":
             user.avatar_url = img_url
         db.session.commit()
