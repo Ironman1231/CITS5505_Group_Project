@@ -461,7 +461,7 @@ def update_profile():
     new_username = request.form.get("new_username").strip()
     new_bio = request.form.get("new_bio").strip()
     is_changed = request.form.get("is_changed")
-    img_url = None
+    new_img_url = None
 
     if is_changed == "True":
         img = request.files.get("avatar_image")
@@ -469,10 +469,11 @@ def update_profile():
             flash("Please choose an image")
             print("Please choose an image")
             return redirect(url_for("profile")) 
+
         # convert image to url
         ext = img.filename.rsplit('.', 1)[1].lower()
         filename = f"{uuid.uuid4()}.{ext}"
-        img_url = upload_image(img, filename)
+        new_img_url = upload_image(img, filename)
     
     user_id = current_user.id
     user = User.query.filter(User.id == user_id).first()
@@ -487,7 +488,7 @@ def update_profile():
             return redirect(url_for("profile"))
         
         user = User.query.filter_by(username = new_username).first()
-        if user:
+        if user and user != current_user:
             flash("The username already exist")
             print("The username already exist")
             return redirect(url_for("profile"))
@@ -500,7 +501,10 @@ def update_profile():
         user.username = new_username
         user.new_bio = new_bio
         if is_changed == "True":
-            user.avatar_url = img_url
+            if current_user.avatar_url:
+                delete_image(current_user.avatar_url)
+            user.avatar_url = new_img_url
+
         db.session.commit()
 
     return redirect(url_for("profile"))
