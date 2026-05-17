@@ -1,15 +1,7 @@
-import os
-import pytest
-from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.alert import Alert
-
-BASE_URL      = os.getenv("FLASK_BASE_URL", "http://127.0.0.1:5000")
-TEST_USERNAME = os.getenv("TEST_USERNAME", "seleniumtestuser")
-TEST_EMAIL    = "seleniumtestuser@example.com"
-TEST_PASSWORD = os.getenv("TEST_PASSWORD", "TestPassword123")
 
 
 def dismiss_any_alert(driver, timeout=3):
@@ -21,61 +13,16 @@ def dismiss_any_alert(driver, timeout=3):
         pass
 
 
-def register_test_user(driver):
-    """Register the test user through the app before login tests run."""
-    driver.get(f"{BASE_URL}/register.html")
-
-    WebDriverWait(driver, 10).until(
-        EC.visibility_of_element_located((By.ID, "username"))
-    )
-
-    driver.find_element(By.ID, "username").send_keys(TEST_USERNAME)
-    driver.find_element(By.ID, "email").send_keys(TEST_EMAIL)
-    driver.find_element(By.ID, "password").send_keys(TEST_PASSWORD)
-    driver.find_element(By.ID, "confirm_password").send_keys(TEST_PASSWORD)
-
-    driver.find_element(
-        By.CSS_SELECTOR, "#register-form button[type='submit']"
-    ).click()
-
-    dismiss_any_alert(driver)
-
-    # Wait for redirect away from register page (user created successfully)
-    # If the user already exists, the page stays on register — that's fine too
-    try:
-        WebDriverWait(driver, 5).until(
-            lambda d: "register" not in d.current_url
-        )
-    except Exception:
-        pass  # User may already exist in the DB — login test will still work
-
-
-@pytest.fixture
-def driver():
-    """Set up a headless Edge browser for each test."""
-    options = webdriver.EdgeOptions()
-    options.add_argument("--headless")
-    options.add_argument("--no-sandbox")
-    options.add_argument("--disable-dev-shm-usage")
-    options.add_argument("--window-size=1920,1080")
-
-    driver = webdriver.Edge(options=options)
-    driver.implicitly_wait(5)
-    yield driver
-    driver.quit()
-
-
 # ------------------------------------------------------------------ #
 # Selenium Test: Login with valid credentials redirects to home #127  #
 # ------------------------------------------------------------------ #
 class TestLoginRedirect:
 
-    def test_login_valid_credentials_redirects_to_home(self, driver):
-        # Register the test user through the app first
-        register_test_user(driver)
-
+    def test_login_valid_credentials_redirects_to_home(
+        self, driver, base_url, selenium_user
+    ):
         # Navigate to /login.html
-        driver.get(f"{BASE_URL}/login.html")
+        driver.get(f"{base_url}/login.html")
 
         # Wait for the login form to be visible
         WebDriverWait(driver, 10).until(
@@ -83,8 +30,8 @@ class TestLoginRedirect:
         )
 
         # Fill in valid username and password
-        driver.find_element(By.ID, "login-username").send_keys(TEST_USERNAME)
-        driver.find_element(By.ID, "login-password").send_keys(TEST_PASSWORD)
+        driver.find_element(By.ID, "login-username").send_keys(selenium_user.username)
+        driver.find_element(By.ID, "login-password").send_keys("TestPassword123")
 
         # Click the submit button
         driver.find_element(
@@ -101,7 +48,7 @@ class TestLoginRedirect:
         assert "login" not in driver.current_url
 
         # Verify the user is on the home page
-        assert driver.current_url == f"{BASE_URL}/" or ("/index" in driver.current_url)
+        assert driver.current_url == f"{base_url}/" or ("/index" in driver.current_url)
 
 
 # ------------------------------------------------------------------ #
@@ -109,9 +56,9 @@ class TestLoginRedirect:
 # ------------------------------------------------------------------ #
 class TestLoginInvalidCredentials:
 
-    def test_login_invalid_credentials_stays_on_login(self, driver):
+    def test_login_invalid_credentials_stays_on_login(self, driver, base_url):
         # Navigate to /login.html
-        driver.get(f"{BASE_URL}/login.html")
+        driver.get(f"{base_url}/login.html")
 
         # Wait for the login form to be visible
         WebDriverWait(driver, 10).until(

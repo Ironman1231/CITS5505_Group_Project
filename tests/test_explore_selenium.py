@@ -1,31 +1,11 @@
-import pytest
-from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import Select, WebDriverWait
 
 
-BASE_URL = "http://127.0.0.1:5000"
-
-
-@pytest.fixture
-def driver():
-    """Set up a headless Edge browser for each test."""
-    options = webdriver.EdgeOptions()
-    options.add_argument("--headless")
-    options.add_argument("--no-sandbox")
-    options.add_argument("--disable-dev-shm-usage")
-    options.add_argument("--window-size=1920,1080")
-
-    driver = webdriver.Edge(options=options)
-    driver.implicitly_wait(5)
-    yield driver
-    driver.quit()
-
-
-def test_search_returns_results_page(driver):
-    driver.get(f"{BASE_URL}/explore.html")
+def test_search_returns_results_page(driver, base_url):
+    driver.get(f"{base_url}/explore.html")
 
     search_input = WebDriverWait(driver, 10).until(
         EC.visibility_of_element_located(
@@ -44,8 +24,8 @@ def test_search_returns_results_page(driver):
     assert "q=park" in driver.current_url
 
 
-def test_category_filter_updates_url(driver):
-    driver.get(f"{BASE_URL}/explore.html")
+def test_category_filter_updates_url(driver, base_url):
+    driver.get(f"{base_url}/explore.html")
 
     category_select = WebDriverWait(driver, 10).until(
         EC.visibility_of_element_located((By.CSS_SELECTOR, "select[name='category']"))
