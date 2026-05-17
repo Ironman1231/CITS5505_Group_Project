@@ -139,16 +139,25 @@ Run one specific test:
 
 ```bash
 python -m pytest tests/test_auth.py::test_register_new_user_successfully
-
-The following code will be decided on whether it should be kept after running the test.
-> TODO
-
-For test_checkin_selenium.py file, run following code
-
-```bash
-pytest tests/test_checkin_selenium.py
 ```
-For test_checkin.py file, run following code
+
+### Attation!
+If you are runing test on systems other than Mac, you should adjust the conftest.py as following:
+
+- comment the configuration on setting up database, which is
+
 ```bash
-DATABASE_URL="sqlite:///:memory:" pytest tests/test_checkin.py
+os.environ.setdefault(
+    "DATABASE_URL",
+    f"sqlite:///{os.path.join('/private/tmp', f'perthpins_pytest_{os.getpid()}.db')}",
+)
+```
+
+- add your own database configuration, for exampple:
+
+```bash
+os.environ.setdefault(
+    "DATABASE_URL",
+    "sqlite:///:memory:"
+)
 ```
