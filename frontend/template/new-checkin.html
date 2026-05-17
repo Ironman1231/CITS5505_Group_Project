@@ -18,6 +18,18 @@
 -->
 {% include "navbar.html" %}
 
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="container mt-2">
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
 
 <!-- Page header -->
 <div class="bg-white border-bottom py-4">
@@ -356,18 +368,6 @@
   modal.show()
 </script>
 {% endif %}
-{% with messages = get_flashed_messages(with_categories=true) %}
-  {% if messages %}
-    <div class="container mt-2">
-      {% for category, message in messages %}
-        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-          {{ message }}
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-      {% endfor %}
-    </div>
-  {% endif %}
-{% endwith %}
 
 </body>
 </html>
