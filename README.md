@@ -105,6 +105,37 @@ More detailed database operation notes are available in:
 docs/db_operations.md
 ```
 
+### Demo Data and Accounts
+
+The repository includes a local SQLite demo database. If you need to rebuild the
+demo data from scratch, run:
+
+```bash
+source .venv/bin/activate
+python seed_demo_data.py
+```
+
+This clears the local application data, uploads demo images to the configured
+Cloudflare R2 bucket, and creates realistic users, check-ins, photos, comments,
+and favourites.
+
+All seeded demo users use the same password:
+
+```text
+Password123!
+```
+
+| Username             | Email                         |
+|----------------------|-------------------------------|
+| `mia_wanderer`       | `mia.wanderer@example.com`    |
+| `uwa_studybites`     | `studybites@example.com`      |
+| `riverlight`         | `riverlight@example.com`      |
+| `coffee_cartographer` | `coffee.cartographer@example.com` |
+| `nightowl_perth`     | `nightowl.perth@example.com`  |
+| `greenloop`          | `greenloop@example.com`       |
+| `market_maven`       | `market.maven@example.com`    |
+| `perth_pins_admin`   | `admin@example.com`           |
+
 ### 4. Run the Application
 
 ```bash
