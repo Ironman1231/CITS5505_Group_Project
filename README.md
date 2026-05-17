@@ -78,3 +78,13 @@ flask --app backend.app db upgrade
 ## How to Run the Tests
 
 > TODO
+
+For test_checkin_selenium.py file, run following code
+
+```bash
+pytest tests/test_checkin_selenium.py
+```
+For test_checkin.py file, run following code
+```bash
+DATABASE_URL="sqlite:///:memory:" pytest tests/test_checkin.py
+```
