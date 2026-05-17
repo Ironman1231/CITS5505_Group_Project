@@ -14,6 +14,13 @@ markerData.forEach(function(m) {
   title.className = 'perthpins-popup-title';
   title.textContent = m.title || 'Untitled';
 
+  let place = null;
+  if (m.place_name) {
+    place = document.createElement('div');
+    place.className = 'perthpins-popup-place';
+    place.textContent = m.place_name;
+  }
+
   const category = document.createElement('span');
   category.className = 'perthpins-popup-category';
   category.textContent = m.category || 'Uncategorised';
@@ -23,11 +30,12 @@ markerData.forEach(function(m) {
   rating.textContent = m.rating ? `Rating: ${m.rating} / 5` : 'Not rated yet';
 
   const link = document.createElement('a');
-  link.href = `/checkin/${m.id}`;
+  link.href = `/checkins/${m.id}`;
   link.textContent = 'View Details →';
   link.style.fontSize = '0.82rem';
 
   popup.appendChild(title);
+  if (place) popup.appendChild(place);
   popup.appendChild(category);
   popup.appendChild(rating);
   popup.appendChild(link);

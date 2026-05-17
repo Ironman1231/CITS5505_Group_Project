@@ -48,6 +48,7 @@ class CheckIn(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    place_name = db.Column(db.String(128))
     title = db.Column(db.String(128), nullable=False)
     description = db.Column(db.Text)
     category = db.Column(db.String(64), index=True)

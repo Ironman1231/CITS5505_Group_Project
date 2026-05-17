@@ -5,7 +5,7 @@ import uuid
 
 import boto3
 from dotenv import load_dotenv
-from flask import flash, redirect, render_template, request, url_for
+from flask import current_app, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required, login_user, logout_user
 from flask_wtf.csrf import CSRFError
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -129,7 +129,15 @@ def register_routes(app):
     def index():
         check_ins = CheckIn.query.order_by(CheckIn.created_at.desc()).all()
         markers = [
-            {"lat": c.lat, "lng": c.lng, "title": c.title, "category": c.category}
+            {
+                "id": c.id,
+                "lat": c.lat,
+                "lng": c.lng,
+                "title": c.title,
+                "place_name": c.place_name,
+                "category": c.category,
+                "rating": c.rating,
+            }
             for c in check_ins if c.lat is not None and c.lng is not None
         ]
         return render_template(
@@ -219,6 +227,7 @@ def register_routes(app):
             "lat": check_in.lat,
             "lng": check_in.lng,
             "title": check_in.title,
+            "place_name": check_in.place_name,
             "category": EXPLORE_CATEGORIES.get(category, category.title()),
         }
         return render_template(
@@ -290,6 +299,12 @@ def register_routes(app):
     def new_checkin():
         if request.method == "POST":
             # get information from the front end by id
+            place_name = request.form.get("place_name", "").strip()
+            if not place_name:
+                flash("Place name is required")
+                print("Place name is required")
+                return redirect(url_for('new_checkin'))
+
             title = request.form.get("title")
             if not title:
                 flash("Title is required")
@@ -330,6 +345,7 @@ def register_routes(app):
             # for all data into a dictionary
             form_data = {
                 "user_id": current_user.id,
+                "place_name": place_name,
                 "title": title,
                 "description": description,
                 "category": category,
@@ -345,6 +361,7 @@ def register_routes(app):
     
             check_in = CheckIn(
                 user_id = user.id,
+                place_name = form_data["place_name"],
                 title = form_data["title"],
                 description = form_data["description"],
                 category = form_data["category"],
@@ -424,22 +441,10 @@ def register_routes(app):
     @app.route("/update_profile", methods = ["POST"])
     @login_required
     def update_profile():
-        new_username = request.form.get("new_username").strip()
-        new_bio = request.form.get("new_bio").strip()
+        new_username = request.form.get("new_username", "").strip()
+        new_bio = request.form.get("new_bio", "").strip()
         is_changed = request.form.get("is_changed")
         new_img_url = None
-    
-        if is_changed == "True":
-            img = request.files.get("avatar_image")
-            if not img:
-                flash("Please choose an image")
-                print("Please choose an image")
-                return redirect(url_for("profile")) 
-    
-            # convert image to url
-            ext = img.filename.rsplit('.', 1)[1].lower()
-            filename = f"{uuid.uuid4()}.{ext}"
-            new_img_url = upload_image(img, filename)
         
         user_id = current_user.id
         user = User.query.filter(User.id == user_id).first()
@@ -463,15 +468,41 @@ def register_routes(app):
                 flash("Please type username")
                 print("Please type username")
                 return redirect(url_for("profile"))
+
+            old_avatar_url = user.avatar_url
+            if is_changed == "True":
+                img = request.files.get("avatar_image")
+                if not img or not img.filename:
+                    flash("Please choose an image", "danger")
+                    return redirect(url_for("profile"))
+                if "." not in img.filename:
+                    flash("Avatar image must have a file extension.", "danger")
+                    return redirect(url_for("profile"))
+
+                ext = img.filename.rsplit(".", 1)[1].lower()
+                filename = f"{uuid.uuid4()}.{ext}"
+                try:
+                    new_img_url = upload_image(img, filename)
+                except Exception as error:
+                    current_app.logger.exception("Avatar upload failed")
+                    flash(f"Avatar upload failed: {error}", "danger")
+                    return redirect(url_for("profile"))
         
             user.username = new_username
             user.bio = new_bio
             if is_changed == "True":
-                if current_user.avatar_url:
-                    delete_image(current_user.avatar_url)
                 user.avatar_url = new_img_url
     
             db.session.commit()
+
+            if is_changed == "True" and old_avatar_url:
+                try:
+                    delete_image(old_avatar_url)
+                except Exception:
+                    current_app.logger.warning(
+                        "Old avatar cleanup failed for user %s", user.id, exc_info=True
+                    )
+                    flash("Profile updated, but the old avatar could not be removed from storage.", "warning")
     
         return redirect(url_for("profile"))
     
@@ -485,11 +516,26 @@ def register_routes(app):
         ).first_or_404()
     
         photos = checkin.photos.all()
+        failed_deletes = 0
         for photo in photos:
-            delete_image(photo.url)
+            try:
+                delete_image(photo.url)
+            except Exception:
+                failed_deletes += 1
+                current_app.logger.warning(
+                    "Check-in photo cleanup failed for photo %s", photo.id, exc_info=True
+                )
     
         db.session.delete(checkin)
         db.session.commit()
+
+        if failed_deletes:
+            flash(
+                f"Check-in deleted, but {failed_deletes} image file(s) could not be removed from storage.",
+                "warning",
+            )
+        else:
+            flash("Check-in deleted successfully.", "success")
     
         return redirect(url_for("profile"))
     
