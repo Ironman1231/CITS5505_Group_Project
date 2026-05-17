@@ -6,17 +6,47 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.alert import Alert
 
 BASE_URL = "http://127.0.0.1:5000"
-TEST_USERNAME = "user1"
-TEST_PASSWORD = "123"
+TEST_USERNAME = "seleniumtestuser"
+TEST_EMAIL    = "seleniumtestuser@example.com"
+TEST_PASSWORD = "TestPassword123"
 
 
 def dismiss_any_alert(driver, timeout=3):
-    """Dismiss any alert that may be present."""
+    """Dismiss any native browser alert that may be present."""
     try:
         WebDriverWait(driver, timeout).until(EC.alert_is_present())
         Alert(driver).accept()
     except Exception:
         pass
+
+
+def register_test_user(driver):
+    """Register the test user through the app before login tests run."""
+    driver.get(f"{BASE_URL}/register.html")
+
+    WebDriverWait(driver, 10).until(
+        EC.visibility_of_element_located((By.ID, "username"))
+    )
+
+    driver.find_element(By.ID, "username").send_keys(TEST_USERNAME)
+    driver.find_element(By.ID, "email").send_keys(TEST_EMAIL)
+    driver.find_element(By.ID, "password").send_keys(TEST_PASSWORD)
+    driver.find_element(By.ID, "confirm_password").send_keys(TEST_PASSWORD)
+
+    driver.find_element(
+        By.CSS_SELECTOR, "#register-form button[type='submit']"
+    ).click()
+
+    dismiss_any_alert(driver)
+
+    # Wait for redirect away from register page (user created successfully)
+    # If the user already exists, the page stays on register — that's fine too
+    try:
+        WebDriverWait(driver, 5).until(
+            lambda d: "register" not in d.current_url
+        )
+    except Exception:
+        pass  # User may already exist in the DB — login test will still work
 
 
 @pytest.fixture
@@ -40,6 +70,9 @@ def driver():
 class TestLoginRedirect:
 
     def test_login_valid_credentials_redirects_to_home(self, driver):
+        # Register the test user through the app first
+        register_test_user(driver)
+
         # Navigate to /login.html
         driver.get(f"{BASE_URL}/login.html")
 
@@ -107,4 +140,3 @@ class TestLoginInvalidCredentials:
             EC.visibility_of_element_located((By.CSS_SELECTOR, ".alert"))
         )
         assert error_alert.is_displayed()
-
