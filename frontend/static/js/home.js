@@ -18,10 +18,26 @@ markerData.forEach(function(m) {
   category.className = 'perthpins-popup-category';
   category.textContent = m.category || 'Uncategorised';
 
+  const rating = document.createElement('div');
+  rating.className = 'perthpins-popup-rating';
+  rating.textContent = m.rating ? `Rating: ${m.rating} / 5` : 'Not rated yet';
+
+  const link = document.createElement('a');
+  link.href = `/checkin/${m.id}`;
+  link.textContent = 'View Details →';
+  link.style.fontSize = '0.82rem';
+
   popup.appendChild(title);
   popup.appendChild(category);
+  popup.appendChild(rating);
+  popup.appendChild(link);
 
   L.marker([m.lat, m.lng])
     .addTo(map)
     .bindPopup(popup);
 });
+
+if (markerData.length > 0) {
+  const bounds = markerData.map(m => [m.lat, m.lng]);
+  map.fitBounds(bounds, { padding: [40, 40] });
+}
