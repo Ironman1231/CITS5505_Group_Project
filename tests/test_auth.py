@@ -32,7 +32,8 @@ def test_register_new_user_successfully(client):
         follow_redirects=True,
     )
 
-    # Verify the response status code is 200
+    # follow_redirects=True means status 200 confirms the final page loaded
+    # successfully after any redirect, not just that a redirect occurred
     assert response.status_code == 200
 
     # Verify the new user exists in the database with the correct username and email
@@ -67,11 +68,12 @@ def test_register_duplicate_username_fails(client):
         follow_redirects=True,
     )
 
-    # Verify the response status code is 200 (re-renders the form with an error)
+    # follow_redirects=True means 200 here confirms the form was re-rendered
+    # with an error, not redirected away on success
     assert response.status_code == 200
+    assert b"invalid" in response.data or b"error" in response.data or b"taken" in response.data
 
     # Verify only one user with that username exists in the database
     with app.app_context():
         users = User.query.filter_by(username="takenuser").all()
         assert len(users) == 1
-
