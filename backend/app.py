@@ -455,6 +455,10 @@ def update_profile():
 
     if is_changed == "True":
         img = request.files.get("avatar_image")
+        if not img:
+            flash("Please choose an image")
+            print("Please choose an image")
+            return redirect(url_for("profile")) 
         # convert image to url
         ext = img.filename.rsplit('.', 1)[1].lower()
         filename = f"{uuid.uuid4()}.{ext}"
@@ -467,6 +471,16 @@ def update_profile():
         flash("Please login first", "baduser")
         return render_template("profile.html")
     else:
+        if not username:
+            flash("Please type username")
+            print("Please type username")
+            return redirect(url_for("profile"))
+        
+        if not bio:
+            flash("Please type username")
+            print("Please type username")
+            return redirect(url_for("profile"))
+    
         user.username = username
         user.bio = bio
         if is_changed == "True":
